@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Traffic
+namespace TrafficModel
 {
     public abstract class Vehicle
     {

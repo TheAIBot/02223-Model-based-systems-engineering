@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 
-namespace Traffic
+namespace TrafficModel
 {
     public class Ambulance : Vehicle
     {
