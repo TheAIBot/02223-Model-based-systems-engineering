@@ -1,7 +1,7 @@
 using System;
 using System.Drawing;
 
-namespace TrafficModel
+namespace TrafficModel.Vehicle
 {
     public class Ambulance : Vehicle
     {
@@ -11,7 +11,7 @@ namespace TrafficModel
 
         }
     
-        public override void tick()
+        public override void Tick()
         {
             Console.WriteLine("Ambulance tick!");
         }

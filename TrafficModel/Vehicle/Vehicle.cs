@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace TrafficModel
+namespace TrafficModel.Vehicle
 {
     public abstract class Vehicle
     {
@@ -12,18 +12,19 @@ namespace TrafficModel
             REVERSE = 3
         }
 
-        public enum PriorityType {
+        public enum PriorityType
+        {
             CAR = 0,
             PUBLIC_TRANSPORT = 1,
             EMERGENCY = 2
         }
 
-        protected Point Pos;
-        protected Size Size;
-        protected int Rotation;
-        protected Point Velocity;
-        protected int VisionRadius;
-        protected PriorityType Priority;
+        protected Point Pos { get; private set; }
+        protected Size Size { get; private set; }
+        protected int Rotation { get; private set; }
+        protected Point Velocity { get; private set; }
+        protected int VisionRadius { get; private set; }
+        protected PriorityType Priority { get; private set; }
 
         public Vehicle(Point pos, Size size, int rotation, Point velocity,
          int visionRadius, PriorityType priority) {
@@ -35,7 +36,7 @@ namespace TrafficModel
             Priority = priority;
         }
 
-        public abstract void tick();
+        public abstract void Tick();
     }
 
 }
