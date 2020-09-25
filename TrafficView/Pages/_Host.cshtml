@@ -14,6 +14,119 @@
     <base href="~/" />
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
+    <script>
+        'use strict';
+
+        class Road {
+            constructor(startX, startY, endX, endY) {
+                this.startX = startX;
+                this.startY = startY;
+                this.endX = endX;
+                this.endY = endY;
+                this.color = "#888888";
+            }
+
+            draw(context) {
+                const ROAD_WIDTH = 3;
+
+                drawLine(context, this.startX, this.startY, this.endX, this.endY, ROAD_WIDTH, this.color);
+            }
+        }
+
+        class Vehicle {
+            constructor(startX, startY, endX, endY, color) {
+                this.startX = startX;
+                this.startY = startY;
+                this.endX = endX;
+                this.endY = endY;
+                this.color = color;
+            }
+
+            updatePos(startX, startY, endX, endY) {
+                this.startX = startX;
+                this.startY = startY;
+                this.endX = endX;
+                this.endY = endY;
+            }
+
+            draw(context) {
+                const CAR_WIDTH = 2;
+
+                drawLine(context, this.startX, this.startY, this.endX, this.endY, CAR_WIDTH, this.color);
+            }
+        }
+
+        var roads = {};
+        var vehicles = {};
+
+
+
+        function addRoad(roadID, startX, startY, endX, endY) {
+            roads[roadID] = new Road(startX, startY, endX, endY);
+        }
+
+        function addVehicle(carID, startX, startY, endX, endY, color) {
+            vehicles[carID] = new Vehicle(startX, startY, endX, endY, color);
+        }
+
+        function removeVehicle(carID) {
+            delete vehicles[carID];
+        }
+
+        function updateVehiclePos(carID, startX, startY, endX, endY) {
+            vehicles[carID].updatePos(startX, startY, endX, endY);
+        }
+
+        function updateRoadColor(roadID, color) {
+            roads[roadID].color = color;
+        }
+
+        function drawLine(context, startX, startY, endX, endY, width, color) {
+            context.beginPath();
+            context.moveTo(startX, startY);
+            context.lineTo(endX, endY);
+            context.lineWidth = width;
+            context.strokeStyle = color;
+            context.stroke();
+        }
+
+        function clearCanvas(canvas, context) {
+
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+        }
+
+        var renderTraffic = false;
+        var isFirstFrame = true;
+
+        function setRenderTraffic(doRender) {
+            renderTraffic = doRender;
+        }
+
+        function updateSimRender() {
+            if (renderTraffic) {
+                var canvas = document.getElementById('draw-area');
+                var context = canvas.getContext('2d');
+
+                if (isFirstFrame) {
+                    isFirstFrame = false;
+                    context.scale(5, 5);
+                }
+
+                clearCanvas(canvas, context);
+
+                for (const road of Object.values(roads)) {
+                    road.draw(context);
+                }
+                for (const vehicle of Object.values(vehicles)) {
+                    vehicle.draw(context);
+                }
+            }
+
+            requestAnimationFrame(updateSimRender);
+        }
+        requestAnimationFrame(updateSimRender);
+    </script>
 </head>
 <body>
     <app>
