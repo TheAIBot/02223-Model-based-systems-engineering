@@ -24,9 +24,9 @@
         {
             Simulator = new TrafficSim();
 
-            Road start = new Road(new Vector2(10, 20), new Vector2(40, 20));
-            Road end = new Road(new Vector2(50, 20), new Vector2(70, 20));
-            Road endPath = new Road(new Vector2(70, 20), new Vector2(80, 20));
+            Road start = new Road(new Vector2(10, 55), new Vector2(45, 55));
+            Road end = new Road(new Vector2(65, 55), new Vector2(95, 55));
+            Road endPath = new Road(new Vector2(95, 55), new Vector2(100, 55));
             end.AddOutgoingRoad(endPath);
 
             Simulator.AddRoad(start);
@@ -37,17 +37,39 @@
             start.AddVehicle(car);
             Simulator.AddVehicleToSim(car);
 
+
+
+            Road startH = new Road(new Vector2(55, 10), new Vector2(55, 45));
+            Road endH = new Road(new Vector2(55, 65), new Vector2(55, 95));
+            Road endPathH = new Road(new Vector2(55, 95), new Vector2(55, 100));
+            endH.AddOutgoingRoad(endPathH);
+
+            Simulator.AddRoad(startH);
+            Simulator.AddRoad(endH);
+            Simulator.AddRoad(endPathH);
+
+            Car car2 = new Car(startH, startH.RoadStart);
+            start.AddVehicle(car2);
+            Simulator.AddVehicleToSim(car2);
+
+
+
             TrafficLight tl = new TrafficLight(Simulator, new RoadConnectionGroup[]
             {
                 new RoadConnectionGroup(new RoadConnection[]
                 {
                     new RoadConnection(start, end)
+                }),
+                new RoadConnectionGroup(new RoadConnection[]
+                {
+                    new RoadConnection(startH, endH)
                 })
             });
 
             Simulator.AddIntersection(tl);
 
             car.SetPathTo(endPath);
+            car2.SetPathTo(endPathH);
 
             foreach (var road in Simulator.Roads)
             {
@@ -130,7 +152,7 @@
             veh.ID,
             carBack.X, carBack.Y,
             carFront.X, carFront.Y,
-            "#ff0000"
+            "#ff4400"
         });
     }
 
