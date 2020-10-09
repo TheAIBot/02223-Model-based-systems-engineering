@@ -6,10 +6,10 @@ import trafficLightControllers.dynamicTrafficLights as dynamicLightCtrl
 class TestSmallMaps(unittest.TestCase):
 
     def test_single_cross_light(self):
-        staticSim = sim.SumoSim("1-1TL1W-Lane/intersection.net.xml", staticLightCtrl.staticTrafficLightController())
+        staticSim = sim.SumoSim("testMaps/1-1TL1W-Lane/intersection.net.xml", staticLightCtrl.staticTrafficLightController())
         staticTime = staticSim.run()
 
-        dynamicSim = sim.SumoSim("1-1TL1W-Lane/intersection.net.xml", dynamicLightCtrl.dynamicTrafficLightController())
+        dynamicSim = sim.SumoSim("testMaps/1-1TL1W-Lane/intersection.net.xml", dynamicLightCtrl.dynamicTrafficLightController())
         dynamicTime = dynamicSim.run()
 
         self.assertTrue(staticTime >= dynamicTime)

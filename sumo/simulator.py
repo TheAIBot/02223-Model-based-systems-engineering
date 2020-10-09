@@ -28,8 +28,8 @@ class SumoSim():
 
         mapFolder = os.path.dirname(mapFilepath)
         mapName = Path.Path(mapFilepath).stem
-        mapConfigFilepath = os.path.join(mapFolder, os.path.join(mapName, ".sumocfg"))
-        with open("data/cross.rou.xml", "w") as mapConfig:
+        mapConfigFilepath = os.path.join(mapFolder, mapName + ".sumocfg")
+        with open(mapConfigFilepath, "w") as mapConfig:
             print("<configuration>", file=mapConfig)
             print("    <input>", file=mapConfig)
             print("        <net-file value=\"{}\"/>".format(mapFilepath), file=mapConfig)
@@ -37,7 +37,7 @@ class SumoSim():
             print("    </input>", file=mapConfig)
             print("</configuration>", file=mapConfig)
 
-        traci.start([checkBinary('sumo'), "-c", mapConfigFilepath, "--tripinfo-output", "tripinfo.xml"])
+        traci.start([checkBinary('sumo'), "-c", mapConfigFilepath])
 
     def run(self):
         ticks = 0
