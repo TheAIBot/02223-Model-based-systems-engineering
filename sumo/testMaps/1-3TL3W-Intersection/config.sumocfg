@@ -1,0 +1,8 @@
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="Z:\02223-Model-based-systems-engineering\sumo\testMaps\1-3TL3W-Intersection\network.net.xml"/>
+	    <route-files value="Z:\02223-Model-based-systems-engineering\sumo\testMaps\1-3TL3W-Intersection\testroutes.rou.xml"/>
+    </input>
+
+</configuration>

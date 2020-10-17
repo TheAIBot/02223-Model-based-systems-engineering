@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 10/08/20 14:19:55 by Eclipse SUMO netedit Version 1.7.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+
+    <input>
+        <sumo-net-file value="C:\Users\iyyel\Documents\SUMO\Maps\1-1TL1W-Lane\intersection.net.xml"/>
+    </input>
+
+    <output>
+        <output-file value="C:\Users\iyyel\Documents\SUMO\Maps\1-1TL1W-Lane\intersection.net.xml"/>
+    </output>
+
+    <processing>
+        <geometry.min-radius.fix.railways value="false"/>
+        <geometry.max-grade.fix value="false"/>
+        <offset.disable-normalization value="true"/>
+        <lefthand value="false"/>
+    </processing>
+
+    <junctions>
+        <no-turnarounds value="true"/>
+        <junctions.corner-detail value="5"/>
+        <junctions.limit-turn-speed value="5.5"/>
+        <rectangular-lane-cut value="false"/>
+    </junctions>
+
+    <pedestrian>
+        <walkingareas value="false"/>
+    </pedestrian>
+
+    <report>
+        <aggregate-warnings value="5"/>
+    </report>
+
+</configuration>
+-->
+
+<net version="1.6" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+
+    <location netOffset="0.00,0.00" convBoundary="100.00,0.00,500.00,0.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
+
+    <edge id=":TL_0" function="internal">
+        <lane id=":TL_0_0" index="0" speed="13.89" length="0.10" shape="300.00,-1.60 300.00,-1.60"/>
+    </edge>
+
+    <edge id="E1" from="JS" to="TL" priority="-1">
+        <lane id="E1_0" index="0" speed="13.89" length="200.00" shape="100.00,-1.60 300.00,-1.60"/>
+    </edge>
+    <edge id="E2" from="TL" to="JE" priority="-1">
+        <lane id="E2_0" index="0" speed="13.89" length="200.00" shape="300.00,-1.60 500.00,-1.60"/>
+    </edge>
+
+    <tlLogic id="gneJ1" type="static" programID="0" offset="0">
+        <phase duration="30" state="r"/>
+        <phase duration="30" state="y"/>
+        <phase duration="30" state="g"/>
+    </tlLogic>
+
+    <junction id="JE" type="dead_end" x="500.00" y="0.00" incLanes="E2_0" intLanes="" shape="500.00,-3.20 500.00,0.00"/>
+    <junction id="JS" type="dead_end" x="100.00" y="0.00" incLanes="" intLanes="" shape="100.00,0.00 100.00,-3.20"/>
+    <junction id="TL" type="traffic_light" x="300.00" y="0.00" incLanes="E1_0" intLanes=":TL_0_0" shape="300.00,0.00 300.00,-3.20 300.00,0.00">
+        <request index="0" response="0" foes="0" cont="0"/>
+    </junction>
+
+    <connection from="E1" to="E2" fromLane="0" toLane="0" via=":TL_0_0" tl="gneJ1" linkIndex="0" dir="s" state="O"/>
+
+    <connection from=":TL_0" to="E2" fromLane="0" toLane="0" dir="s" state="M"/>
+
+</net>
