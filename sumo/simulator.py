@@ -32,8 +32,8 @@ class SumoSim():
         with open(mapConfigFilepath, "w") as mapConfig:
             print("<configuration>", file=mapConfig)
             print("    <input>", file=mapConfig)
-            print("        <net-file value=\"{}\"/>".format(mapFilepath), file=mapConfig)
-            print("        <route-files value=\"{}\"/>".format(routesFilepath), file=mapConfig)
+            print("        <net-file value=\"{}\"/>".format(os.path.basename(mapFilepath)), file=mapConfig)
+            print("        <route-files value=\"{}\"/>".format(os.path.basename(routesFilepath)), file=mapConfig)
             print("    </input>", file=mapConfig)
             print("</configuration>", file=mapConfig)
 

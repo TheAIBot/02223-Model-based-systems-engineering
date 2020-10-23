@@ -3,31 +3,40 @@ import simulator as sim
 import trafficLightControllers.staticLights as staticLightCtrl
 import trafficLightControllers.dynamicTrafficLights as dynamicLightCtrl
 
+def test_map(tester, mapPath):
+    staticSim = sim.SumoSim(mapPath, staticLightCtrl.staticTrafficLightController())
+    staticTime = staticSim.run()
+
+    dynamicSim = sim.SumoSim(mapPath, dynamicLightCtrl.dynamicTrafficLightController())
+    dynamicTime = dynamicSim.run()
+
+    tester.assertTrue(staticTime >= dynamicTime)
+
 class TestSmallMaps(unittest.TestCase):
 
-    def test_single_cross_light(self):
-        staticSim = sim.SumoSim("testMaps/1-1TL1W-Lane/intersection.net.xml", staticLightCtrl.staticTrafficLightController())
-        staticTime = staticSim.run()
+    def test_1_1TL1W_Lane(self):
+        test_map(self, "testMaps/1-1TL1W-Lane/network.net.xml")
 
-        dynamicSim = sim.SumoSim("testMaps/1-1TL1W-Lane/intersection.net.xml", dynamicLightCtrl.dynamicTrafficLightController())
-        dynamicTime = dynamicSim.run()
+    def test_1_3TL3W_Intersection(self):
+        test_map(self, "testMaps/1-3TL3W-Intersection/network.net.xml")
 
-        self.assertTrue(staticTime >= dynamicTime)
+    def test_1_4TL4W_Intersection(self):
+        test_map(self, "testMaps/1-4TL4W-Intersection/network.net.xml")
 
-    def test_single_t_light(self):
-        pass
+    def test_1_Circular_Lane(self):
+        test_map(self, "testMaps/1-Circular-Lane/network.net.xml")
 
-    def test_cross_and_t_light(self):
-        pass
+    def test_2_4TL4W_Intersection(self):
+        test_map(self, "testMaps/2-4TL4W-Intersection/network.net.xml")
 
-    def test_dual_t_light(self):
-        pass
+    def test_2_4TL4W_Intersection_2(self):
+        test_map(self, "testMaps/2-4TL4W-Intersection-2/network.net.xml")
 
-    def test_dual_cross_light(self):
-        pass
+    def test_2_Circular_Lane(self):
+        test_map(self, "testMaps/2-Circular-Lane/network.net.xml")
 
-    def test_quad_cross_light(self):
-        pass
+    def test_4_4TL4W_Intersection(self):
+        test_map(self, "testMaps/4-4TL4W-Intersection/network.net.xml")
 
 
 

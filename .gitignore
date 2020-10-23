@@ -137,3 +137,7 @@ _NCrunch*
 **/**.rou.xml
 **/**.pyc
 **/**.trips.xml
+
+**/testMaps/**/*.net.sumocfg
+**/testMaps/**/routes.alt.xml
+**/testMaps/**/routes.xml
