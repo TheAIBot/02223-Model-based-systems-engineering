@@ -24,7 +24,7 @@ class SumoSim():
     def __init__(self, mapFilepath, trafficLightController):
         self.tlCtrl = trafficLightController
 
-        routesFilepath = routeGen.gen_random_routes(mapFilepath)
+        routesFilepath = routeGen.gen_random_routes(mapFilepath, 50)
 
         mapFolder = os.path.dirname(mapFilepath)
         mapName = Path.Path(mapFilepath).stem

@@ -1,0 +1,7 @@
+<configuration>
+    <input>
+        <net-file value="network.net.xml"/>
+        <route-files value="routes.xml"/>
+        <additional-files value="lanedetector.xml"/>
+    </input>
+</configuration>

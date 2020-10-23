@@ -1,22 +1,4 @@
 #!/usr/bin/env python
-# Eclipse SUMO, Simulation of Urban MObility; see https://eclipse.org/sumo
-# Copyright (C) 2009-2020 German Aerospace Center (DLR) and others.
-# This program and the accompanying materials are made available under the
-# terms of the Eclipse Public License 2.0 which is available at
-# https://www.eclipse.org/legal/epl-2.0/
-# This Source Code may also be made available under the following Secondary
-# Licenses when the conditions for such availability set forth in the Eclipse
-# Public License 2.0 are satisfied: GNU General Public License, version 2
-# or later which is available at
-# https://www.gnu.org/licenses/old-licenses/gpl-2.0-standalone.html
-# SPDX-License-Identifier: EPL-2.0 OR GPL-2.0-or-later
-
-# @file    runner.py
-# @author  Lena Kalleske
-# @author  Daniel Krajzewicz
-# @author  Michael Behrisch
-# @author  Jakob Erdmann
-# @date    2009-03-26
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -25,6 +7,12 @@ import os
 import sys
 import optparse
 import random
+import pathlib as Path
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+parentdirdir = os.path.dirname(parentdir)
+sys.path.append(parentdirdir)
+import routeGen
 
 # we need to import python modules from the $SUMO_HOME/tools directory
 if 'SUMO_HOME' in os.environ:
@@ -36,6 +24,7 @@ else:
 from sumolib import checkBinary  # noqa
 import traci  # noqa
 
+
 def get_options():
     optParser = optparse.OptionParser()
     optParser.add_option("--nogui", action="store_true",
@@ -43,12 +32,6 @@ def get_options():
     options, args = optParser.parse_args()
     return options
 
-def numberv(lane):
-    nb = 0
-    for k in traci.lane.getLastStepVehicleIDs(lane):
-        if traci.vehicle.getLanePosition(k) < X-100:
-             nb += 1
-    return nb
 
 def run():
     """execute the TraCI control loop"""
@@ -105,11 +88,25 @@ if __name__ == "__main__":
         sumoBinary = checkBinary('sumo-gui')
 
     # first, generate the route file for this simulation
-    #generate_routefile()
+    mapFilePath = "network.net.xml"
+    routesFilepath = routeGen.gen_random_routes(mapFilePath, 50)
+    laneDecPath = "lanedetector.xml"
+
+    # generate config.sumocfg
+    mapFolder = os.path.dirname(mapFilePath)
+    mapName = Path.Path(mapFilePath).stem
+    mapConfigFilepath = os.path.join(mapFolder, "config.sumocfg")
+    with open(mapConfigFilepath, "w") as mapConfig:
+        print("<configuration>", file=mapConfig)
+        print("    <input>", file=mapConfig)
+        print("        <net-file value=\"{}\"/>".format(os.path.basename(mapFilePath)), file=mapConfig)
+        print("        <route-files value=\"{}\"/>".format(os.path.basename(routesFilepath)), file=mapConfig)
+        print("        <additional-files value=\"{}\"/>".format(os.path.basename(laneDecPath)), file=mapConfig)
+        print("    </input>", file=mapConfig)
+        print("</configuration>", file=mapConfig)
 
     # this is the normal way of using traci. sumo is started as a
     # subprocess and then the python script connects and runs
     print("--------------- TraCI is ready. Waiting for simulation... ---------------")
-    traci.start([sumoBinary, "-c", "config.sumocfg",
-                             "--tripinfo-output", "tripinfo.xml"])
+    traci.start([sumoBinary, "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--tripinfo-output", "tripinfo.xml"])
     run()
