@@ -13,6 +13,7 @@ parentdir = os.path.dirname(currentdir)
 parentdirdir = os.path.dirname(parentdir)
 sys.path.append(parentdirdir)
 import routeGen
+import trip_stats as Stats
 
 # we need to import python modules from the $SUMO_HOME/tools directory
 if 'SUMO_HOME' in os.environ:
@@ -117,8 +118,11 @@ def run():
     print("Arrived vehicles: {arrivedNum}, Vehicle simulation duration sum: {durSum}, Vehicle average simulation duration: {avgDuration}")
     """
 
+
     traci.close()
+    Stats.gen_trip_stats()
     sys.stdout.flush()
+
 
 
 # this is the main entry point of this script

@@ -1,0 +1,25 @@
+#################### Trip Statistics ####################
+########## General ##########
+File name:                      tripinfo.xml
+Total trips (num vehicles):     41
+
+Total vehicle duration:         2380.0
+Mean vehicle duration:          58.048780487804876
+
+########## Emissions ##########
+Total CO emitted (mg):          215732.31945900002
+Total CO2 emitted (mg):         5652935.5561730005
+Total HC emitted (mg):          1112.4918580000003
+Total PMx emitted (mg):         108.222465
+Total NOx emitted (mg):         2395.13884
+Total fuel emitted (mg):        2430.049523
+Total electricity emitted (mg): 0.0
+
+Mean CO emitted (mg):           5261.763889243903
+Mean CO2 emitted (mg):          137876.47697982928
+Mean HC emitted (mg):           27.13394775609757
+Mean PMx emitted (mg):          2.6395723170731706
+Mean NOx emitted (mg):          58.41802048780488
+Mean fuel emitted (mg):         59.269500560975615
+Mean electricity emitted (mg):  0.0
+#########################################################
