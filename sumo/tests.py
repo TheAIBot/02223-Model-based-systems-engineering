@@ -15,9 +15,9 @@ def test_map(tester, mapPath):
 class TestSmallMaps(unittest.TestCase):
 
     def test_1_1TL1W_Lane(self):
-        test_map(self, "testMaps/1-1TL1W-Lane/network.net.xml")
+        test_map(self, "testMaps/1-1TL1W-Lane-N/network.net.xml")
 
-    def test_1_3TL3W_Intersection(self):
+"""    def test_1_3TL3W_Intersection(self):
         test_map(self, "testMaps/1-3TL3W-Intersection/network.net.xml")
 
     def test_1_4TL4W_Intersection(self):
@@ -38,7 +38,7 @@ class TestSmallMaps(unittest.TestCase):
     def test_4_4TL4W_Intersection(self):
         test_map(self, "testMaps/4-4TL4W-Intersection/network.net.xml")
 
-
+"""
 
 
 
