@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- generated on 10/29/20 12:53:28 by Eclipse SUMO GUI Version 1.7.0
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/sumoConfiguration.xsd">
+
+    <input>
+        <net-file value="Z:\02223-Model-based-systems-engineering\sumo\testMaps\4_crossings_with_traffic_and_E2s\4%20crossings%20with%20traffic%20and%20E2&apos;s\network.net.xml"/>
+        <route-files value="Z:\02223-Model-based-systems-engineering\sumo\testMaps\4_crossings_with_traffic_and_E2s\4%20crossings%20with%20traffic%20and%20E2&apos;s\routes.rou.xml"/>
+        <additional-files value="Z:\02223-Model-based-systems-engineering\sumo\testMaps\4_crossings_with_traffic_and_E2s\4%20crossings%20with%20traffic%20and%20E2&apos;s\tazs.add.xml,Z:\02223-Model-based-systems-engineering\sumo\testMaps\4_crossings_with_traffic_and_E2s\4%20crossings%20with%20traffic%20and%20E2&apos;s\stops.add.xml,Z:\02223-Model-based-systems-engineering\sumo\testMaps\4_crossings_with_traffic_and_E2s\4%20crossings%20with%20traffic%20and%20E2&apos;s\e2Detector.add.xml"/>
+    </input>
+
+</configuration>
+-->
+
+<detector xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/det_e2_file.xsd">
+   <interval begin="0.00" end="135.00" id="e2Detector_R1i_0" sampledSeconds="296.52" nVehEntered="11" nVehLeft="8" nVehSeen="11" meanSpeed="2.02" meanTimeLoss="22.72" meanOccupancy="35.81" maxOccupancy="61.75" meanMaxJamLengthInVehicles="1.39" meanMaxJamLengthInMeters="15.32" maxJamLengthInVehicles="4" maxJamLengthInMeters="50.00" jamLengthInVehiclesSum="187" jamLengthInMetersSum="2068.12" meanHaltingDuration="19.70" maxHaltingDuration="37.00" haltingDurationSum="197.00" meanIntervalHaltingDuration="19.70" maxIntervalHaltingDuration="37.00" intervalHaltingDurationSum="197.00" startedHalts="10.00" meanVehicleNumber="2.27" maxVehicleNumber="4" />
+</detector>

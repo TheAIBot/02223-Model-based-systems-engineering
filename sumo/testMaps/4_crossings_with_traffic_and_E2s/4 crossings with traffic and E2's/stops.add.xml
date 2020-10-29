@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<additional>
+    
+    <busStop id="Stop_a1" lane="L0i_0" startPos="25" endPos="40" lines="Line1"/>
+    <busStop id="Stop_a2" lane="TR-TL-r_0" startPos="35" endPos="50" lines="Line1 Line2"/>
+    <busStop id="Stop_a3" lane="BR-TL-d_0" startPos="35" endPos="50" lines="Line1"/>
+    <busStop id="Stop_a4" lane="R1o_0" startPos="50" endPos="65" lines="Line1 Line2"/>
+
+    <busStop id="Stop_b4" lane="R1i_0" startPos="50" endPos="65" lines="Line1 Line2"/>
+    <busStop id="Stop_b3" lane="BR-TL-u_0" startPos="35" endPos="50" lines="Line1"/>
+    <busStop id="Stop_b2" lane="TR-TL-l_0" startPos="35" endPos="50" lines="Line1 Line2"/>
+    <busStop id="Stop_b1" lane="L0o_0" startPos="25" endPos="40" lines="Line1"/>
+
+</additional>
