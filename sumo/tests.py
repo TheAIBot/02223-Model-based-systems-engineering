@@ -14,16 +14,13 @@ def test_map(tester, mapPath):
 
     print()
     print("static passenger: " + str(staticTime.getPassengerWaitingTime()))
-    print("static pass co2:  " + str(staticTime.getPassengerCO2()))
     print("static emergency: " + str(staticTime.getEmergencyWaitingTime()))
     print()
     print("dynamic passenger: " + str(dynamicTime.getPassengerWaitingTime()))
-    print("dynamic pass co2:  " + str(dynamicTime.getPassengerCO2()))
     print("dynamic emergency: " + str(dynamicTime.getEmergencyWaitingTime()))
 
     tester.assertTrue(staticTime.getPassengerWaitingTime() >= dynamicTime.getPassengerWaitingTime())
     tester.assertTrue(staticTime.getEmergencyWaitingTime() >= dynamicTime.getEmergencyWaitingTime())
-    tester.assertTrue(staticTime.getPassengerCO2() >= dynamicTime.getPassengerCO2())
 
 class TestSmallMaps(unittest.TestCase):
 
