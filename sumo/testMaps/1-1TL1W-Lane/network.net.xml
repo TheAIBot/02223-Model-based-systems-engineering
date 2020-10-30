@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 10/23/20 13:57:55 by Eclipse SUMO netedit Version 1.7.0
+<!-- generated on 10/08/20 14:19:55 by Eclipse SUMO netedit Version 1.7.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumo-net-file value="C:\Users\iyyel\Documents\02223-Model-based-systems-engineering\sumo\testMaps\1-1TL1W-Lane-N\network.net.xml"/>
+        <sumo-net-file value="C:\Users\iyyel\Documents\SUMO\Maps\1-1TL1W-Lane\intersection.net.xml"/>
     </input>
 
     <output>
-        <output-file value="C:\Users\iyyel\Documents\02223-Model-based-systems-engineering\sumo\testMaps\1-1TL1W-Lane-N\network.net.xml"/>
+        <output-file value="C:\Users\iyyel\Documents\SUMO\Maps\1-1TL1W-Lane\intersection.net.xml"/>
     </output>
 
     <processing>
@@ -52,10 +52,9 @@
     </edge>
 
     <tlLogic id="gneJ1" type="static" programID="0" offset="0">
-        <phase duration="27" state="r"/>
-        <phase duration="3"  state="y"/>
-        <phase duration="27" state="g"/>
-        <phase duration="3"  state="y"/>
+        <phase duration="30" state="r"/>
+        <phase duration="30" state="y"/>
+        <phase duration="30" state="g"/>
     </tlLogic>
 
     <junction id="JE" type="dead_end" x="500.00" y="0.00" incLanes="E2_0" intLanes="" shape="500.00,-3.20 500.00,0.00"/>

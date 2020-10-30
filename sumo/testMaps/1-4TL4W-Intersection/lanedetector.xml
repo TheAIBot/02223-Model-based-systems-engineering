@@ -1,21 +1,21 @@
 <additional>
    <laneAreaDetector id="lad_n1" lane="n1o_0" 
    pos="62" length="30" 
-   friendlyPos="true" freq="1000" file="out.xml" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
    timeThreshold="1" speedThreshold="5" jamThreshold="10" />
   
   <laneAreaDetector id="lad_n2" lane="n2o_0" 
    pos="62" length="30" 
-   friendlyPos="true" freq="1000" file="out.xml" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
    timeThreshold="1" speedThreshold="5" jamThreshold="10" />
 
   <laneAreaDetector id="lad_n3" lane="n3o_0" 
    pos="62" length="30" 
-   friendlyPos="true" freq="1000" file="out.xml" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
    timeThreshold="1" speedThreshold="5" jamThreshold="10" />
 
   <laneAreaDetector id="lad_n4" lane="n4o_0" 
    pos="62" length="30" 
-   friendlyPos="true" freq="1000" file="out.xml" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
    timeThreshold="1" speedThreshold="5" jamThreshold="10" />
 </additional>
