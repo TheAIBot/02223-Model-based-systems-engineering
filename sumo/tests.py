@@ -27,7 +27,7 @@ def test_map(tester, mapPath):
 class TestSmallMaps(unittest.TestCase):
 
     def test_1_1TL1W_Lane(self):
-        test_map(self, "testMaps/1-1TL1W-Lane-N/network.net.xml")
+        test_map(self, "testMaps/1-1TL1W-Lane/network.net.xml")
 
 """    def test_1_3TL3W_Intersection(self):
         test_map(self, "testMaps/1-3TL3W-Intersection/network.net.xml")
