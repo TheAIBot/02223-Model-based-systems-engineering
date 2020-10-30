@@ -307,28 +307,32 @@
     </edge>
 
     <tlLogic id="TL-TL" type="static" programID="0" offset="0">
-        <phase duration="42" state="GGgrrrGGgrrr"/>
-        <phase duration="3"  state="yyyrrryyyrrr"/>
-        <phase duration="42" state="rrrGGgrrrGGg"/>
-        <phase duration="3"  state="rrryyyrrryyy"/>
+        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
+        <phase duration="30" state="yyyrrryyyrrr" name="vYellow" />
+        <phase duration="30" state="rrryyyrrryyy" name="hYellow" />
+        <phase duration="30" state="gggrrrgggrrr" name="vGreen" />
+        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
     </tlLogic>
     <tlLogic id="TR-TL" type="static" programID="0" offset="0">
-        <phase duration="42" state="GGgrrrGGgrrr"/>
-        <phase duration="3"  state="yyyrrryyyrrr"/>
-        <phase duration="42" state="rrrGGgrrrGGg"/>
-        <phase duration="3"  state="rrryyyrrryyy"/>
+        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
+        <phase duration="30" state="yyyrrryyyrrr" name="vYellow" />
+        <phase duration="30" state="rrryyyrrryyy" name="hYellow" />
+        <phase duration="30" state="gggrrrgggrrr" name="vGreen" />
+        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
     </tlLogic>
     <tlLogic id="BL-TL" type="static" programID="0" offset="0">
-        <phase duration="42" state="GGgrrrGGgrrr"/>
-        <phase duration="3"  state="yyyrrryyyrrr"/>
-        <phase duration="42" state="rrrGGgrrrGGg"/>
-        <phase duration="3"  state="rrryyyrrryyy"/>
+        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
+        <phase duration="30" state="yyyrrryyyrrr" name="vYellow" />
+        <phase duration="30" state="rrryyyrrryyy" name="hYellow" />
+        <phase duration="30" state="gggrrrgggrrr" name="vGreen" />
+        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
     </tlLogic>
     <tlLogic id="BR-TL" type="static" programID="0" offset="0">
-        <phase duration="42" state="GGgrrrGGgrrr"/>
-        <phase duration="3"  state="yyyrrryyyrrr"/>
-        <phase duration="42" state="rrrGGgrrrGGg"/>
-        <phase duration="3"  state="rrryyyrrryyy"/>
+        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
+        <phase duration="30" state="yyyrrryyyrrr" name="vYellow" />
+        <phase duration="30" state="rrryyyrrryyy" name="hYellow" />
+        <phase duration="30" state="gggrrrgggrrr" name="vGreen" />
+        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
     </tlLogic>
 
     <junction id="B0" type="dead_end" x="100.00" y="-100.00" incLanes="B0i_0" intLanes="" shape="100.00,-100.00 96.80,-100.00 100.00,-100.00"/>

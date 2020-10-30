@@ -53,8 +53,10 @@
 
     <tlLogic id="TL" type="static" programID="0" offset="0">
         <phase duration="30" state="r" name="Red"/>
-        <phase duration="60" state="y" name="vYellow"/>
-        <phase duration="60" state="g" name="vGreen"/>
+        <phase duration="30" state="y" name="vYellow" />
+        <phase duration="30" state="y" name="hYellow" />
+        <phase duration="30" state="g" name="vGreen" />
+        <phase duration="30" state="g" name="hGreen"/>
     </tlLogic>
 
     <junction id="JE" type="dead_end" x="500.00" y="0.00" incLanes="E2_0" intLanes="" shape="500.00,-3.20 500.00,0.00"/>

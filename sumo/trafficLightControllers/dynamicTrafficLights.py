@@ -42,27 +42,27 @@ class dynamicTrafficLightController():
             dectTopId = tLightId + "_top"
             dectBottomId = tLightId + "_bottom"
 
-            
+            detectors = sim.lanearea.getIDList()
 
-        
+            # loop through all of the registered lane detectors,
+            # find out which lane that has the greatest amount of cars
+            mostTrafficDetector = ""
+            mostTrafficNum = 0
+            for detectorId in detectors:
+                vechNum = sim.lanearea.getLastStepVehicleNumber(detectorId)
+                if vechNum > 0 and vechNum > mostTrafficNum:
+                    mostTrafficNum = vechNum
+                    mostTrafficDetector = detectorId
 
-
-            """
-            phase = sim.trafficlight.getPhase(tLightId)
-            if sim.lanearea.getLastStepVehicleNumber(tLightId) > 0:
-                # there is a vehicle incoming from the left lane, switch to
-                # yellow for a few seconds before changing to green
-                if phase == 0:
-                    sim.trafficlight.setPhase(tLightId, 1)
-                    sim.trafficlight.setPhaseDuration(tLightId, 5.0)
-                elif phase == 1:
-                    sim.trafficlight.setPhase(tLightId, 2)
-            else:
-                # if there is no vehicles coming from the left lane,
-                # switch to yellow for a few seconds, then switch to red.
-                if phase == 2:
-                    sim.trafficlight.setPhase(tLightId, 1)
-                    sim.trafficlight.setPhaseDuration(tLightId, 5.0)
-                elif phase == 1:
-                    sim.trafficlight.setPhase(tLightId, 0)
-                    """
+            if mostTrafficDetector != "":
+                print(f"Most traffic: {mostTrafficDetector}, Number: {mostTrafficNum}")
+                if mostTrafficDetector == dectLeftId or mostTrafficDetector == dectRightId:
+                    if curPhase == allRed:
+                        sim.trafficlight.setPhase(tLightId, hYellow)
+                    else:
+                        sim.trafficlight.setPhase(tLightId, hGreen)
+                elif mostTrafficDetector == dectTopId or mostTrafficDetector == dectBottomId:
+                    if curPhase == allRed:
+                        sim.trafficlight.setPhase(tLightId, vYellow)
+                    else:
+                        sim.trafficlight.setPhase(tLightId, vGreen)

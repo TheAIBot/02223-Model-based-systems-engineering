@@ -12,24 +12,27 @@ def test_map(tester, mapPath):
     dynamicSim = sim.SumoSim(mapPath, dynamicLightCtrl.dynamicTrafficLightController())
     dynamicTime = dynamicSim.run()
 
-    print()
-    print("static passenger: " + str(staticTime.getPassengerWaitingTime()))
-    print("static emergency: " + str(staticTime.getEmergencyWaitingTime()))
-    print()
-    print("dynamic passenger: " + str(dynamicTime.getPassengerWaitingTime()))
-    print("dynamic emergency: " + str(dynamicTime.getEmergencyWaitingTime()))
+    print_results(staticTime, "static")
+    print_results(dynamicTime, "dynamic")
 
     tester.assertTrue(staticTime.getPassengerWaitingTime() >= dynamicTime.getPassengerWaitingTime())
     tester.assertTrue(staticTime.getEmergencyWaitingTime() >= dynamicTime.getEmergencyWaitingTime())
     tester.assertEqual(0, staticTime.getCollisionsCount())
     tester.assertEqual(0, dynamicTime.getCollisionsCount())
 
+
+def print_results(time, title):
+    print()
+    print(f"########## {title} simulation results ##########")
+    print(f"Passenger vehicle waiting time: {time.getPassengerWaitingTime()}")
+    print(f"Emergency vehicle waiting time: {time.getEmergencyWaitingTime()}")
+    print(f"HC emission (mg): {time.getEmissions()[0].getHCEmissions()})")
+    print(f"##################################################")
+    print()
+
+
 class TestSmallMaps(unittest.TestCase):
 
-    def test_1_1TL1W_Lane(self):
-        test_map(self, "testMaps/1-1TL1W-Lane/network.net.xml")
-
-"""
     def test_1_1TL1W_Lane(self):
         test_map(self, "testMaps/1-1TL1W-Lane/network.net.xml")
 
@@ -47,8 +50,6 @@ class TestSmallMaps(unittest.TestCase):
 
     def test_4_4TL4W_Intersection(self):
         test_map(self, "testMaps/4-4TL4W-Intersection/network.net.xml")
-
-"""
 
 
 
