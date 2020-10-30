@@ -46,24 +46,26 @@ class SumoSim():
             print("    </input>", file=mapConfig)
             print("</configuration>", file=mapConfig)
 
-        traci.start([checkBinary('sumo'), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--tripinfo-output", "tripinfo.xml", "--waiting-time-memory", "100000"])
-        trafficLightController.init(traci)
+        traci.start([checkBinary('sumo'), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000"], label= str(self.tlCtrl))
+        self.sumoCon = traci.getConnection(str(self.tlCtrl))
+
+        trafficLightController.init(self.sumoCon)
 
     def run(self):
         measurements = SimMeasurements(1)
 
         ticks = 0
-        while traci.simulation.getMinExpectedNumber() > 0:
-            self.tlCtrl.updateLights(traci)
+        while self.sumoCon.simulation.getMinExpectedNumber() > 0:
+            self.tlCtrl.updateLights(self.sumoCon)
 
-            measurements.update(traci)
+            measurements.update(self.sumoCon)
 
-            traci.simulationStep()
+            self.sumoCon.simulationStep()
             ticks += 1
 
-        measurements.collectAfterSimEnd(traci)
+        measurements.collectAfterSimEnd(self.sumoCon)
 
-        traci.close()
+        self.sumoCon.close()
         sys.stdout.flush()
 
         return measurements
