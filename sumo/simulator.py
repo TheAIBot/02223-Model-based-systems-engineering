@@ -34,15 +34,17 @@ class SumoSim():
             print("    <input>", file=mapConfig)
             print("        <net-file value=\"{}\"/>".format(os.path.basename(mapFilepath)), file=mapConfig)
             print("        <route-files value=\"{}\"/>".format(os.path.basename(routesFilepath)), file=mapConfig)
+            print("        <additional-files value=\"{}\"/>".format("lanedetector.xml"), file=mapConfig)
             print("    </input>", file=mapConfig)
             print("</configuration>", file=mapConfig)
 
-        traci.start([checkBinary('sumo'), "-c", mapConfigFilepath])
+        traci.start([checkBinary('sumo-gui'), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--tripinfo-output", "tripinfo.xml"])
+        trafficLightController.init(traci)
 
     def run(self):
         ticks = 0
         while traci.simulation.getMinExpectedNumber() > 0:
-            self.tlCtrl.updateLights(traci.simulation)
+            self.tlCtrl.updateLights(traci)
 
             traci.simulationStep()
             ticks += 1
