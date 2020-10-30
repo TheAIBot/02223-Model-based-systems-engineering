@@ -11,9 +11,9 @@ class SimMeasurements():
         for vehicleID in sim.vehicle.getIDList():
             if vehicleID not in self.vehiclesData:
                 vehicleClass = sim.vehicle.getVehicleClass(vehicleID)
-                self.vehiclesData[vehicleID] = VehicleData(vehicleID, vehicleClass, self.time)
-            
-            self.vehiclesData[vehicleID].updateVehicleData(sim, self.timeStep)
+                self.vehiclesData[vehicleID] = VehicleData(sim, vehicleID, vehicleClass, self.time)
+            else:
+                self.vehiclesData[vehicleID].updateVehicleData(sim, self.timeStep)
         self.time += 1
 
     def collectAfterSimEnd(self, sim):
