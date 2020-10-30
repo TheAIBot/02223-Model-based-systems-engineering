@@ -21,6 +21,8 @@ def test_map(tester, mapPath):
 
     tester.assertTrue(staticTime.getPassengerWaitingTime() >= dynamicTime.getPassengerWaitingTime())
     tester.assertTrue(staticTime.getEmergencyWaitingTime() >= dynamicTime.getEmergencyWaitingTime())
+    tester.assertEqual(0, staticTime.getCollisionsCount())
+    tester.assertEqual(0, dynamicTime.getCollisionsCount())
 
 class TestSmallMaps(unittest.TestCase):
 

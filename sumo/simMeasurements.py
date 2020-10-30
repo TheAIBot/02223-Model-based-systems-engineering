@@ -5,6 +5,7 @@ class SimMeasurements():
         self.timeStep = timestep
         self.time = 0
         self.vehiclesData = dict()
+        self.vehicleCollisionCount = 0
 
     def update(self, sim):
         for vehicleID in sim.vehicle.getIDList():
@@ -14,6 +15,9 @@ class SimMeasurements():
             
             self.vehiclesData[vehicleID].updateVehicleData(sim, self.timeStep)
         self.time += 1
+
+    def collectAfterSimEnd(self, sim):
+        self.vehicleCollisionCount = sim.simulation.getCollidingVehiclesNumber()
 
     def getPassengerWaitingTime(self):
         passengerSum = 0
@@ -37,3 +41,6 @@ class SimMeasurements():
 
     def getTotalRuntime(self):
         return self.time
+
+    def getCollisionsCount(self):
+        return self.vehicleCollisionCount

@@ -61,6 +61,8 @@ class SumoSim():
             traci.simulationStep()
             ticks += 1
 
+        measurements.collectAfterSimEnd(traci)
+
         traci.close()
         sys.stdout.flush()
 
