@@ -1,5 +1,5 @@
 <additional>
-   <laneAreaDetector id="gneJ1" lane="E1_0" 
+   <laneAreaDetector id="TL_left" lane="E1_0" 
    pos="170" length="29" 
    friendlyPos="true" freq="1000" file="lad_out.xml"
    timeThreshold="1" speedThreshold="5" jamThreshold="10" 

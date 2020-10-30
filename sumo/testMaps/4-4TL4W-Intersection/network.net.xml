@@ -312,19 +312,19 @@
         <phase duration="42" state="rrrGGgrrrGGg"/>
         <phase duration="3"  state="rrryyyrrryyy"/>
     </tlLogic>
-    <tlLogic id="gneJ1" type="static" programID="0" offset="0">
+    <tlLogic id="TR-TL" type="static" programID="0" offset="0">
         <phase duration="42" state="GGgrrrGGgrrr"/>
         <phase duration="3"  state="yyyrrryyyrrr"/>
         <phase duration="42" state="rrrGGgrrrGGg"/>
         <phase duration="3"  state="rrryyyrrryyy"/>
     </tlLogic>
-    <tlLogic id="n0" type="static" programID="0" offset="0">
+    <tlLogic id="BL-TL" type="static" programID="0" offset="0">
         <phase duration="42" state="GGgrrrGGgrrr"/>
         <phase duration="3"  state="yyyrrryyyrrr"/>
         <phase duration="42" state="rrrGGgrrrGGg"/>
         <phase duration="3"  state="rrryyyrrryyy"/>
     </tlLogic>
-    <tlLogic id="n3" type="static" programID="0" offset="0">
+    <tlLogic id="BR-TL" type="static" programID="0" offset="0">
         <phase duration="42" state="GGgrrrGGgrrr"/>
         <phase duration="3"  state="yyyrrryyyrrr"/>
         <phase duration="42" state="rrrGGgrrrGGg"/>
@@ -413,51 +413,51 @@
     <junction id=":TR-TL_14_0" type="internal" x="200.00" y="98.40" incLanes=":TR-TL_8_0 T1o_0" intLanes=":TR-TL_0_0 :TR-TL_1_0 :TR-TL_4_0 :TR-TL_5_0 :TR-TL_10_0 :TR-TL_11_0"/>
     <junction id=":TR-TL_15_0" type="internal" x="198.40" y="100.00" incLanes=":TR-TL_11_0 R1o_0" intLanes=":TR-TL_1_0 :TR-TL_2_0 :TR-TL_3_0 :TR-TL_4_0 :TR-TL_7_0 :TR-TL_8_0"/>
 
-    <connection from="B0o" to="BL-TL-o" fromLane="0" toLane="0" via=":BL-TL_6_0" tl="n0" linkIndex="6" dir="r" state="O"/>
-    <connection from="B0o" to="TL-TL-i" fromLane="0" toLane="0" via=":BL-TL_7_0" tl="n0" linkIndex="7" dir="s" state="O"/>
-    <connection from="B0o" to="L0i" fromLane="0" toLane="0" via=":BL-TL_8_0" tl="n0" linkIndex="8" dir="l" state="o"/>
-    <connection from="B1o" to="R0i" fromLane="0" toLane="0" via=":BR-TL_6_0" tl="n3" linkIndex="6" dir="r" state="O"/>
-    <connection from="B1o" to="BR-TL-o" fromLane="0" toLane="0" via=":BR-TL_7_0" tl="n3" linkIndex="7" dir="s" state="O"/>
-    <connection from="B1o" to="BL-TL-i" fromLane="0" toLane="0" via=":BR-TL_8_0" tl="n3" linkIndex="8" dir="l" state="o"/>
-    <connection from="BL-TL-i" to="TL-TL-i" fromLane="0" toLane="0" via=":BL-TL_3_0" tl="n0" linkIndex="3" dir="r" state="o"/>
-    <connection from="BL-TL-i" to="L0i" fromLane="0" toLane="0" via=":BL-TL_4_0" tl="n0" linkIndex="4" dir="s" state="o"/>
-    <connection from="BL-TL-i" to="B0i" fromLane="0" toLane="0" via=":BL-TL_5_0" tl="n0" linkIndex="5" dir="l" state="o"/>
-    <connection from="BL-TL-o" to="B1i" fromLane="0" toLane="0" via=":BR-TL_9_0" tl="n3" linkIndex="9" dir="r" state="o"/>
-    <connection from="BL-TL-o" to="R0i" fromLane="0" toLane="0" via=":BR-TL_10_0" tl="n3" linkIndex="10" dir="s" state="o"/>
-    <connection from="BL-TL-o" to="BR-TL-o" fromLane="0" toLane="0" via=":BR-TL_11_0" tl="n3" linkIndex="11" dir="l" state="o"/>
-    <connection from="BR-TL-i" to="BL-TL-i" fromLane="0" toLane="0" via=":BR-TL_0_0" tl="n3" linkIndex="0" dir="r" state="O"/>
-    <connection from="BR-TL-i" to="B1i" fromLane="0" toLane="0" via=":BR-TL_1_0" tl="n3" linkIndex="1" dir="s" state="O"/>
-    <connection from="BR-TL-i" to="R0i" fromLane="0" toLane="0" via=":BR-TL_2_0" tl="n3" linkIndex="2" dir="l" state="o"/>
-    <connection from="BR-TL-o" to="R1i" fromLane="0" toLane="0" via=":TR-TL_6_0" tl="gneJ1" linkIndex="6" dir="r" state="O"/>
-    <connection from="BR-TL-o" to="T1i" fromLane="0" toLane="0" via=":TR-TL_7_0" tl="gneJ1" linkIndex="7" dir="s" state="O"/>
-    <connection from="BR-TL-o" to="TR-TL-o" fromLane="0" toLane="0" via=":TR-TL_8_0" tl="gneJ1" linkIndex="8" dir="l" state="o"/>
-    <connection from="L0o" to="B0i" fromLane="0" toLane="0" via=":BL-TL_9_0" tl="n0" linkIndex="9" dir="r" state="o"/>
-    <connection from="L0o" to="BL-TL-o" fromLane="0" toLane="0" via=":BL-TL_10_0" tl="n0" linkIndex="10" dir="s" state="o"/>
-    <connection from="L0o" to="TL-TL-i" fromLane="0" toLane="0" via=":BL-TL_11_0" tl="n0" linkIndex="11" dir="l" state="o"/>
+    <connection from="B0o" to="BL-TL-o" fromLane="0" toLane="0" via=":BL-TL_6_0" tl="BL-TL" linkIndex="6" dir="r" state="O"/>
+    <connection from="B0o" to="TL-TL-i" fromLane="0" toLane="0" via=":BL-TL_7_0" tl="BL-TL" linkIndex="7" dir="s" state="O"/>
+    <connection from="B0o" to="L0i" fromLane="0" toLane="0" via=":BL-TL_8_0" tl="BL-TL" linkIndex="8" dir="l" state="o"/>
+    <connection from="B1o" to="R0i" fromLane="0" toLane="0" via=":BR-TL_6_0" tl="BR-TL" linkIndex="6" dir="r" state="O"/>
+    <connection from="B1o" to="BR-TL-o" fromLane="0" toLane="0" via=":BR-TL_7_0" tl="BR-TL" linkIndex="7" dir="s" state="O"/>
+    <connection from="B1o" to="BL-TL-i" fromLane="0" toLane="0" via=":BR-TL_8_0" tl="BR-TL" linkIndex="8" dir="l" state="o"/>
+    <connection from="BL-TL-i" to="TL-TL-i" fromLane="0" toLane="0" via=":BL-TL_3_0" tl="BL-TL" linkIndex="3" dir="r" state="o"/>
+    <connection from="BL-TL-i" to="L0i" fromLane="0" toLane="0" via=":BL-TL_4_0" tl="BL-TL" linkIndex="4" dir="s" state="o"/>
+    <connection from="BL-TL-i" to="B0i" fromLane="0" toLane="0" via=":BL-TL_5_0" tl="BL-TL" linkIndex="5" dir="l" state="o"/>
+    <connection from="BL-TL-o" to="B1i" fromLane="0" toLane="0" via=":BR-TL_9_0" tl="BR-TL" linkIndex="9" dir="r" state="o"/>
+    <connection from="BL-TL-o" to="R0i" fromLane="0" toLane="0" via=":BR-TL_10_0" tl="BR-TL" linkIndex="10" dir="s" state="o"/>
+    <connection from="BL-TL-o" to="BR-TL-o" fromLane="0" toLane="0" via=":BR-TL_11_0" tl="BR-TL" linkIndex="11" dir="l" state="o"/>
+    <connection from="BR-TL-i" to="BL-TL-i" fromLane="0" toLane="0" via=":BR-TL_0_0" tl="BR-TL" linkIndex="0" dir="r" state="O"/>
+    <connection from="BR-TL-i" to="B1i" fromLane="0" toLane="0" via=":BR-TL_1_0" tl="BR-TL" linkIndex="1" dir="s" state="O"/>
+    <connection from="BR-TL-i" to="R0i" fromLane="0" toLane="0" via=":BR-TL_2_0" tl="BR-TL" linkIndex="2" dir="l" state="o"/>
+    <connection from="BR-TL-o" to="R1i" fromLane="0" toLane="0" via=":TR-TL_6_0" tl="TR-TL" linkIndex="6" dir="r" state="O"/>
+    <connection from="BR-TL-o" to="T1i" fromLane="0" toLane="0" via=":TR-TL_7_0" tl="TR-TL" linkIndex="7" dir="s" state="O"/>
+    <connection from="BR-TL-o" to="TR-TL-o" fromLane="0" toLane="0" via=":TR-TL_8_0" tl="TR-TL" linkIndex="8" dir="l" state="o"/>
+    <connection from="L0o" to="B0i" fromLane="0" toLane="0" via=":BL-TL_9_0" tl="BL-TL" linkIndex="9" dir="r" state="o"/>
+    <connection from="L0o" to="BL-TL-o" fromLane="0" toLane="0" via=":BL-TL_10_0" tl="BL-TL" linkIndex="10" dir="s" state="o"/>
+    <connection from="L0o" to="TL-TL-i" fromLane="0" toLane="0" via=":BL-TL_11_0" tl="BL-TL" linkIndex="11" dir="l" state="o"/>
     <connection from="L1o" to="TL-TL-o" fromLane="0" toLane="0" via=":TL-TL_9_0" tl="TL-TL" linkIndex="9" dir="r" state="o"/>
     <connection from="L1o" to="TR-TL-i" fromLane="0" toLane="0" via=":TL-TL_10_0" tl="TL-TL" linkIndex="10" dir="s" state="o"/>
     <connection from="L1o" to="T0i" fromLane="0" toLane="0" via=":TL-TL_11_0" tl="TL-TL" linkIndex="11" dir="l" state="o"/>
-    <connection from="R0o" to="BR-TL-o" fromLane="0" toLane="0" via=":BR-TL_3_0" tl="n3" linkIndex="3" dir="r" state="o"/>
-    <connection from="R0o" to="BL-TL-i" fromLane="0" toLane="0" via=":BR-TL_4_0" tl="n3" linkIndex="4" dir="s" state="o"/>
-    <connection from="R0o" to="B1i" fromLane="0" toLane="0" via=":BR-TL_5_0" tl="n3" linkIndex="5" dir="l" state="o"/>
-    <connection from="R1o" to="T1i" fromLane="0" toLane="0" via=":TR-TL_3_0" tl="gneJ1" linkIndex="3" dir="r" state="o"/>
-    <connection from="R1o" to="TR-TL-o" fromLane="0" toLane="0" via=":TR-TL_4_0" tl="gneJ1" linkIndex="4" dir="s" state="o"/>
-    <connection from="R1o" to="BR-TL-i" fromLane="0" toLane="0" via=":TR-TL_5_0" tl="gneJ1" linkIndex="5" dir="l" state="o"/>
+    <connection from="R0o" to="BR-TL-o" fromLane="0" toLane="0" via=":BR-TL_3_0" tl="BR-TL" linkIndex="3" dir="r" state="o"/>
+    <connection from="R0o" to="BL-TL-i" fromLane="0" toLane="0" via=":BR-TL_4_0" tl="BR-TL" linkIndex="4" dir="s" state="o"/>
+    <connection from="R0o" to="B1i" fromLane="0" toLane="0" via=":BR-TL_5_0" tl="BR-TL" linkIndex="5" dir="l" state="o"/>
+    <connection from="R1o" to="T1i" fromLane="0" toLane="0" via=":TR-TL_3_0" tl="TR-TL" linkIndex="3" dir="r" state="o"/>
+    <connection from="R1o" to="TR-TL-o" fromLane="0" toLane="0" via=":TR-TL_4_0" tl="TR-TL" linkIndex="4" dir="s" state="o"/>
+    <connection from="R1o" to="BR-TL-i" fromLane="0" toLane="0" via=":TR-TL_5_0" tl="TR-TL" linkIndex="5" dir="l" state="o"/>
     <connection from="T0o" to="L1i" fromLane="0" toLane="0" via=":TL-TL_0_0" tl="TL-TL" linkIndex="0" dir="r" state="O"/>
     <connection from="T0o" to="TL-TL-o" fromLane="0" toLane="0" via=":TL-TL_1_0" tl="TL-TL" linkIndex="1" dir="s" state="O"/>
     <connection from="T0o" to="TR-TL-i" fromLane="0" toLane="0" via=":TL-TL_2_0" tl="TL-TL" linkIndex="2" dir="l" state="o"/>
-    <connection from="T1o" to="TR-TL-o" fromLane="0" toLane="0" via=":TR-TL_0_0" tl="gneJ1" linkIndex="0" dir="r" state="O"/>
-    <connection from="T1o" to="BR-TL-i" fromLane="0" toLane="0" via=":TR-TL_1_0" tl="gneJ1" linkIndex="1" dir="s" state="O"/>
-    <connection from="T1o" to="R1i" fromLane="0" toLane="0" via=":TR-TL_2_0" tl="gneJ1" linkIndex="2" dir="l" state="o"/>
+    <connection from="T1o" to="TR-TL-o" fromLane="0" toLane="0" via=":TR-TL_0_0" tl="TR-TL" linkIndex="0" dir="r" state="O"/>
+    <connection from="T1o" to="BR-TL-i" fromLane="0" toLane="0" via=":TR-TL_1_0" tl="TR-TL" linkIndex="1" dir="s" state="O"/>
+    <connection from="T1o" to="R1i" fromLane="0" toLane="0" via=":TR-TL_2_0" tl="TR-TL" linkIndex="2" dir="l" state="o"/>
     <connection from="TL-TL-i" to="TR-TL-i" fromLane="0" toLane="0" via=":TL-TL_6_0" tl="TL-TL" linkIndex="6" dir="r" state="O"/>
     <connection from="TL-TL-i" to="T0i" fromLane="0" toLane="0" via=":TL-TL_7_0" tl="TL-TL" linkIndex="7" dir="s" state="O"/>
     <connection from="TL-TL-i" to="L1i" fromLane="0" toLane="0" via=":TL-TL_8_0" tl="TL-TL" linkIndex="8" dir="l" state="o"/>
-    <connection from="TL-TL-o" to="L0i" fromLane="0" toLane="0" via=":BL-TL_0_0" tl="n0" linkIndex="0" dir="r" state="O"/>
-    <connection from="TL-TL-o" to="B0i" fromLane="0" toLane="0" via=":BL-TL_1_0" tl="n0" linkIndex="1" dir="s" state="O"/>
-    <connection from="TL-TL-o" to="BL-TL-o" fromLane="0" toLane="0" via=":BL-TL_2_0" tl="n0" linkIndex="2" dir="l" state="o"/>
-    <connection from="TR-TL-i" to="BR-TL-i" fromLane="0" toLane="0" via=":TR-TL_9_0" tl="gneJ1" linkIndex="9" dir="r" state="o"/>
-    <connection from="TR-TL-i" to="R1i" fromLane="0" toLane="0" via=":TR-TL_10_0" tl="gneJ1" linkIndex="10" dir="s" state="o"/>
-    <connection from="TR-TL-i" to="T1i" fromLane="0" toLane="0" via=":TR-TL_11_0" tl="gneJ1" linkIndex="11" dir="l" state="o"/>
+    <connection from="TL-TL-o" to="L0i" fromLane="0" toLane="0" via=":BL-TL_0_0" tl="BL-TL" linkIndex="0" dir="r" state="O"/>
+    <connection from="TL-TL-o" to="B0i" fromLane="0" toLane="0" via=":BL-TL_1_0" tl="BL-TL" linkIndex="1" dir="s" state="O"/>
+    <connection from="TL-TL-o" to="BL-TL-o" fromLane="0" toLane="0" via=":BL-TL_2_0" tl="BL-TL" linkIndex="2" dir="l" state="o"/>
+    <connection from="TR-TL-i" to="BR-TL-i" fromLane="0" toLane="0" via=":TR-TL_9_0" tl="TR-TL" linkIndex="9" dir="r" state="o"/>
+    <connection from="TR-TL-i" to="R1i" fromLane="0" toLane="0" via=":TR-TL_10_0" tl="TR-TL" linkIndex="10" dir="s" state="o"/>
+    <connection from="TR-TL-i" to="T1i" fromLane="0" toLane="0" via=":TR-TL_11_0" tl="TR-TL" linkIndex="11" dir="l" state="o"/>
     <connection from="TR-TL-o" to="T0i" fromLane="0" toLane="0" via=":TL-TL_3_0" tl="TL-TL" linkIndex="3" dir="r" state="o"/>
     <connection from="TR-TL-o" to="L1i" fromLane="0" toLane="0" via=":TL-TL_4_0" tl="TL-TL" linkIndex="4" dir="s" state="o"/>
     <connection from="TR-TL-o" to="TL-TL-o" fromLane="0" toLane="0" via=":TL-TL_5_0" tl="TL-TL" linkIndex="5" dir="l" state="o"/>

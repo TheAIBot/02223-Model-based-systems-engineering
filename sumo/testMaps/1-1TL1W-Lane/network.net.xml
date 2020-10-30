@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 10/08/20 14:19:55 by Eclipse SUMO netedit Version 1.7.0
+<!-- generated on 10/30/20 17:21:43 by Eclipse SUMO netedit Version 1.7.0
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <sumo-net-file value="C:\Users\iyyel\Documents\SUMO\Maps\1-1TL1W-Lane\intersection.net.xml"/>
+        <sumo-net-file value="Z:\02223-Model-based-systems-engineering\sumo\testMaps\1-1TL1W-Lane\network.net.xml"/>
     </input>
 
     <output>
-        <output-file value="C:\Users\iyyel\Documents\SUMO\Maps\1-1TL1W-Lane\intersection.net.xml"/>
+        <output-file value="Z:\02223-Model-based-systems-engineering\sumo\testMaps\1-1TL1W-Lane\network.net.xml"/>
     </output>
 
     <processing>
@@ -51,10 +51,10 @@
         <lane id="E2_0" index="0" speed="13.89" length="200.00" shape="300.00,-1.60 500.00,-1.60"/>
     </edge>
 
-    <tlLogic id="gneJ1" type="static" programID="0" offset="0">
-        <phase duration="30" state="r"/>
-        <phase duration="30" state="y"/>
-        <phase duration="30" state="g"/>
+    <tlLogic id="TL" type="static" programID="0" offset="0">
+        <phase duration="30" state="r" name="Red"/>
+        <phase duration="60" state="y" name="vYellow"/>
+        <phase duration="60" state="g" name="vGreen"/>
     </tlLogic>
 
     <junction id="JE" type="dead_end" x="500.00" y="0.00" incLanes="E2_0" intLanes="" shape="500.00,-3.20 500.00,0.00"/>
@@ -63,7 +63,7 @@
         <request index="0" response="0" foes="0" cont="0"/>
     </junction>
 
-    <connection from="E1" to="E2" fromLane="0" toLane="0" via=":TL_0_0" tl="gneJ1" linkIndex="0" dir="s" state="O"/>
+    <connection from="E1" to="E2" fromLane="0" toLane="0" via=":TL_0_0" tl="TL" linkIndex="0" dir="s" state="O"/>
 
     <connection from=":TL_0" to="E2" fromLane="0" toLane="0" dir="s" state="M"/>
 

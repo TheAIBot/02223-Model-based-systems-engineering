@@ -1,4 +1,3 @@
-
 class staticTrafficLightController():
     def init(self, sim):
         pass

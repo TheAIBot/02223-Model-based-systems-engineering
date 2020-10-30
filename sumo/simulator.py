@@ -46,7 +46,7 @@ class SumoSim():
             print("    </input>", file=mapConfig)
             print("</configuration>", file=mapConfig)
 
-        traci.start([checkBinary('sumo'), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--tripinfo-output", "tripinfo.xml", "--waiting-time-memory", "100000"])
+        traci.start([checkBinary('sumo'), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000"])
         trafficLightController.init(traci)
 
     def run(self):
