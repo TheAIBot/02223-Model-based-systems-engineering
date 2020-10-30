@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import unittest
 import simulator as sim
 import trafficLightControllers.staticLights as staticLightCtrl
