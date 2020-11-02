@@ -26,7 +26,8 @@ def print_results(time, title):
     print(f"########## {title} simulation results ##########")
     print(f"Passenger vehicle waiting time: {time.getPassengerWaitingTime()}")
     print(f"Emergency vehicle waiting time: {time.getEmergencyWaitingTime()}")
-    print(f"HC emission (mg): {time.getEmissions()[0].getHCEmissions()})")
+    print(f"Average vehicle travel time: {time.getAverageTravelTime()}")
+    print(f"HC emission (mg): {time.getEmissions()[0].getHCEmissions()}")
     print(f"##################################################")
     print()
 

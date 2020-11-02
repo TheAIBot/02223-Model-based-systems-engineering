@@ -1,3 +1,6 @@
 <additional>
-  <vType id="vehicle1" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70" emissionClass="HBEFA3" />
+  <vType id="passenger1" vClass="passenger" accel="0.8" decel="4.5" sigma="0.5" length="5" maxSpeed="70" color="blue" emissionClass="HBEFA3" />
+  <vType id="passenger2" vClass="passenger" accel="0.5" decel="3.5" sigma="0.5" length="8" maxSpeed="60" color="yellow" emissionClass="HBEFA3" />
+  <vType id="emergency1" vClass="emergency" accel="0.7" decel="3.5" sigma="0.8" length="7" maxSpeed="60" color="green" emissionClass="HBEFA3" />
+  <vType id="emergency2" vClass="emergency" accel="1.2" decel="4.5" sigma="1" length="4" maxSpeed="80" color="orange" emissionClass="HBEFA3" />
 </additional>

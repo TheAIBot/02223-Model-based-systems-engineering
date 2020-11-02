@@ -48,11 +48,23 @@ class dynamicTrafficLightController():
             # find out which lane that has the greatest amount of cars
             mostTrafficDetector = ""
             mostTrafficNum = 0
+            trafficCount = 0
             for detectorId in detectors:
                 vechNum = sim.lanearea.getLastStepVehicleNumber(detectorId)
-                if vechNum > 0 and vechNum > mostTrafficNum:
-                    mostTrafficNum = vechNum
-                    mostTrafficDetector = detectorId
+                if vechNum > 0:
+                    trafficCount += 1
+                    if vechNum > mostTrafficNum:
+                        mostTrafficNum = vechNum
+                        mostTrafficDetector = detectorId
+
+            if trafficCount == 0:
+                if curPhase == hGreen:
+                    sim.trafficlight.setPhase(tLightId, hYellow)
+                elif curPhase == vGreen: 
+                    sim.trafficlight.setPhase(tLightId, vYellow)
+                else:
+                    sim.trafficlight.setPhase(tLightId, allRed)
+                return
 
             if mostTrafficDetector != "":
                 print(f"Most traffic: {mostTrafficDetector}, Number: {mostTrafficNum}")
@@ -66,3 +78,4 @@ class dynamicTrafficLightController():
                         sim.trafficlight.setPhase(tLightId, vYellow)
                     else:
                         sim.trafficlight.setPhase(tLightId, vGreen)
+                mostTrafficDetector = ""

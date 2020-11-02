@@ -9,5 +9,5 @@ def gen_random_routes(mapFilepath, nVec):
     vehicleTypePath = os.path.join(mapFolderPath, "../../vehicleTypes/vehicle_type.add.xml")
     randomTripsPath = os.path.join(os.environ["SUMO_HOME"], "tools", "randomTrips.py")
     subprocess.run(["python", randomTripsPath, "-n", mapFilepath, "-e", str(nVec), "--seed", "56",
-     "--trip-attributes=type=\"vehicle1\"", "--additional-file", vehicleTypePath, "--route-file", routeFilepath])
+     "--trip-attributes=type=\"passenger1\"", "--additional-file", vehicleTypePath, "--route-file", routeFilepath])
     return routeFilepath

@@ -29,6 +29,12 @@ class SimMeasurements():
     def getEmissions(self):
         return [v.getEmissions() for v in self.vehiclesData.values()]
 
+    def getAverageTravelTime(self):
+        travelTimeSum = 0
+        for v in self.vehiclesData.values():
+            travelTimeSum += v.getTravelTime()
+        return travelTimeSum / len(self.vehiclesData)
+
     def getEmergencyWaitingTime(self):
         emergencySum = 0
         for v in self.vehiclesData.values():
