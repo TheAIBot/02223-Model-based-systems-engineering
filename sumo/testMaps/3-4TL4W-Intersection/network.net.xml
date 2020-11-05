@@ -244,25 +244,40 @@
     </edge>
 
     <tlLogic id="B-TL" type="static" programID="0" offset="0">
-        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
-        <phase duration="30" state="yyyrrryyyrrr" name="vYellow"/>
-        <phase duration="30" state="rrryyyrrryyy" name="hYellow"/>
-        <phase duration="30" state="gggrrrgggrrr" name="vGreen"/>
-        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
+        <!-- Vertical phase while horizontal is red -->
+        <phase duration="40" state="gggrrrgggrrr" name="vGreen_hRed" /> <!-- resting for dynamic -->
+        <phase duration="10" state="yyyrrryyyrrr" name="vYellow_hRed" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="rrruuurrruuu" name="vRed_hOrange"/>
+         <!-- Horizontal phase while vertical is red -->
+        <phase duration="40" state="rrrgggrrrggg" name="vRed_hGreen"/> <!-- or this resting for dynamic -->
+        <phase duration="10" state="rrryyyrrryyy" name="vRed_hYellow" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="uuurrruuurrr" name="vOrange_hRed"/>
     </tlLogic>
     <tlLogic id="T-TL" type="static" programID="0" offset="0">
-        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
-        <phase duration="30" state="yyyrrryyyrrr" name="vYellow"/>
-        <phase duration="30" state="rrryyyrrryyy" name="hYellow"/>
-        <phase duration="30" state="gggrrrgggrrr" name="vGreen"/>
-        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
+        <!-- Vertical phase while horizontal is red -->
+        <phase duration="40" state="gggrrrgggrrr" name="vGreen_hRed" /> <!-- resting for dynamic -->
+        <phase duration="10" state="yyyrrryyyrrr" name="vYellow_hRed" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="rrruuurrruuu" name="vRed_hOrange"/>
+         <!-- Horizontal phase while vertical is red -->
+        <phase duration="40" state="rrrgggrrrggg" name="vRed_hGreen"/> <!-- or this resting for dynamic -->
+        <phase duration="10" state="rrryyyrrryyy" name="vRed_hYellow" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="uuurrruuurrr" name="vOrange_hRed"/>
     </tlLogic>
     <tlLogic id="M-TL" type="static" programID="0" offset="0">
-        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
-        <phase duration="30" state="yyyrrryyyrrr" name="vYellow"/>
-        <phase duration="30" state="rrryyyrrryyy" name="hYellow"/>
-        <phase duration="30" state="gggrrrgggrrr" name="vGreen"/>
-        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
+        <!-- Vertical phase while horizontal is red -->
+        <phase duration="40" state="gggrrrgggrrr" name="vGreen_hRed" /> <!-- resting for dynamic -->
+        <phase duration="10" state="yyyrrryyyrrr" name="vYellow_hRed" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="rrruuurrruuu" name="vRed_hOrange"/>
+         <!-- Horizontal phase while vertical is red -->
+        <phase duration="40" state="rrrgggrrrggg" name="vRed_hGreen"/> <!-- or this resting for dynamic -->
+        <phase duration="10" state="rrryyyrrryyy" name="vRed_hYellow" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="uuurrruuurrr" name="vOrange_hRed"/>
     </tlLogic>
 
     <junction id="B-TL" type="traffic_light" x="200.00" y="-100.00" incLanes="Bi_0 gneE1_0 -gneE2_0 B-TL_0" intLanes=":B-TL_0_0 :B-TL_1_0 :B-TL_12_0 :B-TL_3_0 :B-TL_4_0 :B-TL_13_0 :B-TL_6_0 :B-TL_7_0 :B-TL_14_0 :B-TL_9_0 :B-TL_10_0 :B-TL_15_0" shape="196.80,-92.80 203.20,-92.80 203.64,-95.02 204.20,-95.80 204.98,-96.36 205.98,-96.69 207.20,-96.80 207.20,-103.20 204.98,-103.64 204.20,-104.20 203.64,-104.98 203.31,-105.98 203.20,-107.20 196.80,-107.20 196.36,-104.98 195.80,-104.20 195.02,-103.64 194.02,-103.31 192.80,-103.20 192.80,-96.80 195.02,-96.36 195.80,-95.80 196.36,-95.02 196.69,-94.02">

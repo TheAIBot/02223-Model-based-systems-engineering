@@ -3,22 +3,33 @@
 import unittest
 import simulator as sim
 import trafficLightControllers.staticLights as staticLightCtrl
-import trafficLightControllers.dynamicTrafficLights as dynamicLightCtrl
+import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
+import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
 
 def test_map(tester, mapPath):
+    # normal traffic lights using phase
     staticSim = sim.SumoSim(mapPath, staticLightCtrl.staticTrafficLightController())
     staticTime = staticSim.run()
 
-    dynamicSim = sim.SumoSim(mapPath, dynamicLightCtrl.dynamicTrafficLightController())
-    dynamicTime = dynamicSim.run()
+    # dynamic traffic lights using largest queue first algorithm
+    largestQueueFirstSim = sim.SumoSim(mapPath, largestQueueFirstLightCtrl.largestQueueFirstLightController())
+    largestQueueFirstTime = largestQueueFirstSim.run()
+
+    # dynamic traffic lights using shortest queue first algorithm (not yet working correctly)
+    #shortestQueueFirstSim = sim.SumoSim(mapPath, shortestQueueFirstLightCtrl.shortestQueueFirstLightController())
+    #shortestQueueFirstTime = shortestQueueFirstSim.run()
 
     print_results(staticTime, "static")
-    print_results(dynamicTime, "dynamic")
+    print_results(largestQueueFirstTime, "largest queue first")
+    #print_results(shortestQueueFirstTime, "shortest queue first")
 
-    tester.assertTrue(staticTime.getPassengerWaitingTime() >= dynamicTime.getPassengerWaitingTime())
-    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= dynamicTime.getEmergencyWaitingTime())
+    tester.assertTrue(staticTime.getPassengerWaitingTime() >= largestQueueFirstTime.getPassengerWaitingTime())
+    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= largestQueueFirstTime.getEmergencyWaitingTime())
+    #tester.assertTrue(staticTime.getPassengerWaitingTime() >= shortestQueueFirstTime.getPassengerWaitingTime())
+    #tester.assertTrue(staticTime.getEmergencyWaitingTime() >= shortestQueueFirstTime.getEmergencyWaitingTime())
     tester.assertEqual(0, staticTime.getCollisionsCount())
-    tester.assertEqual(0, dynamicTime.getCollisionsCount())
+    tester.assertEqual(0, largestQueueFirstTime.getCollisionsCount())
+    #tester.assertEqual(0, shortestQueueFirstTime.getCollisionsCount())
 
 
 def print_results(time, title):
@@ -51,7 +62,6 @@ class TestSmallMaps(unittest.TestCase):
 
     def test_4_4TL4W_Intersection(self):
         test_map(self, "testMaps/4-4TL4W-Intersection/network.net.xml")
-
 
 
 if __name__ == '__main__':

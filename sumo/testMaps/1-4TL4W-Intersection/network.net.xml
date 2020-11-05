@@ -114,12 +114,20 @@
         <lane id="n4o_0" index="0" speed="13.89" length="92.80" shape="101.60,-100.00 101.60,-7.20"/>
     </edge>
 
+    <!-- Traffic light phase cycle: Green - Yellow - Red -
+     Red-yellow comb - wrap around -->
+
     <tlLogic id="TL" type="static" programID="0" offset="0">
-        <phase duration="30" state="rrrrrrrrrrrr" name="Red"/>
-        <phase duration="30" state="yyyrrryyyrrr" name="vYellow" />
-        <phase duration="30" state="rrryyyrrryyy" name="hYellow" />
-        <phase duration="30" state="gggrrrgggrrr" name="vGreen" />
-        <phase duration="30" state="rrrgggrrrggg" name="hGreen"/>
+        <!-- Vertical phase while horizontal is red -->
+        <phase duration="40" state="gggrrrgggrrr" name="vGreen_hRed" /> <!-- resting for dynamic -->
+        <phase duration="10" state="yyyrrryyyrrr" name="vYellow_hRed" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="rrruuurrruuu" name="vRed_hOrange"/>
+         <!-- Horizontal phase while vertical is red -->
+        <phase duration="40" state="rrrgggrrrggg" name="vRed_hGreen"/> <!-- or this resting for dynamic -->
+        <phase duration="10" state="rrryyyrrryyy" name="vRed_hYellow" />
+        <phase duration="10" state="rrrrrrrrrrrr" name="vRed_hRed" />
+        <phase duration="10" state="uuurrruuurrr" name="vOrange_hRed"/>
     </tlLogic>
 
     <junction id="TL" type="traffic_light" x="100.00" y="0.00" incLanes="n2o_0 TL2o_0 n4o_0 n1o_0" intLanes=":TL_0_0 :TL_1_0 :TL_12_0 :TL_3_0 :TL_4_0 :TL_13_0 :TL_6_0 :TL_7_0 :TL_14_0 :TL_9_0 :TL_10_0 :TL_15_0" shape="96.80,7.20 103.20,7.20 103.64,4.98 104.20,4.20 104.98,3.64 105.98,3.31 107.20,3.20 107.20,-3.20 104.98,-3.64 104.20,-4.20 103.64,-4.98 103.31,-5.98 103.20,-7.20 96.80,-7.20 96.36,-4.98 95.80,-4.20 95.02,-3.64 94.02,-3.31 92.80,-3.20 92.80,3.20 95.02,3.64 95.80,4.20 96.36,4.98 96.69,5.98">

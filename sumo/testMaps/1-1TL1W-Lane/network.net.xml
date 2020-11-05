@@ -52,11 +52,16 @@
     </edge>
 
     <tlLogic id="TL" type="static" programID="0" offset="0">
-        <phase duration="30" state="r" name="Red"/>
-        <phase duration="30" state="y" name="vYellow" />
-        <phase duration="30" state="y" name="hYellow" />
-        <phase duration="30" state="g" name="vGreen" />
-        <phase duration="30" state="g" name="hGreen"/>
+        <!-- Vertical phase while horizontal is red -->
+        <phase duration="40" state="g" name="vGreen_hRed" /> <!-- resting for dynamic -->
+        <phase duration="10" state="y" name="vYellow_hRed" />
+        <phase duration="10" state="r" name="vRed_hRed" />
+        <phase duration="10" state="u" name="vRed_hOrange"/>
+         <!-- Horizontal phase while vertical is red -->
+        <phase duration="40" state="g" name="vRed_hGreen"/> <!-- or this resting for dynamic -->
+        <phase duration="10" state="y" name="vRed_hYellow" />
+        <phase duration="10" state="r" name="vRed_hRed" />
+        <phase duration="10" state="u" name="vOrange_hRed"/>
     </tlLogic>
 
     <junction id="JE" type="dead_end" x="500.00" y="0.00" incLanes="E2_0" intLanes="" shape="500.00,-3.20 500.00,0.00"/>
