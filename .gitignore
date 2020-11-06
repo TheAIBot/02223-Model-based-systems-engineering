@@ -146,3 +146,4 @@ _NCrunch*
 **/testMaps/**/trips*.xml
 **/testMaps/**/out.xml
 **/testMaps/**/lad_out.xml
+/sumo/graphs/**
