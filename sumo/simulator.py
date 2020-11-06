@@ -29,10 +29,13 @@ import traci  # noqa
 
 class SumoSim():
 
-    def __init__(self, mapFilepath, trafficLightController):
+    def __init__(self, mapFilepath, trafficLightController, trafficThroughputMultiplier = 0.25):
         self.tlCtrl = trafficLightController
 
-        routesFilepath = routeGen.gen_random_routes(mapFilepath, 50)
+        tripFiles = []
+        for i in range(10):
+            tripFiles.append(routeGen.genRandomTrips(mapFilepath, i, 50, trafficThroughputMultiplier))
+        routeFile = os.path.basename(routeGen.genRoutesFromTrips(mapFilepath, tripFiles))
 
         mapFolder = os.path.dirname(mapFilepath)
         mapName = Path.Path(mapFilepath).stem
@@ -41,12 +44,12 @@ class SumoSim():
             print("<configuration>", file=mapConfig)
             print("    <input>", file=mapConfig)
             print("        <net-file value=\"{}\"/>".format(os.path.basename(mapFilepath)), file=mapConfig)
-            print("        <route-files value=\"{}\"/>".format(os.path.basename(routesFilepath)), file=mapConfig)
+            print("        <route-files value=\"{}\"/>".format(routeFile), file=mapConfig)
             print("        <additional-files value=\"{}\"/>".format("lanedetector.xml"), file=mapConfig)
             print("    </input>", file=mapConfig)
             print("</configuration>", file=mapConfig)
 
-        traci.start([checkBinary('sumo-gui'), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000"], label= str(self.tlCtrl))
+        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000"], label= str(self.tlCtrl))
         self.sumoCon = traci.getConnection(str(self.tlCtrl))
 
         trafficLightController.init(self.sumoCon)

@@ -143,5 +143,6 @@ _NCrunch*
 **/testMaps/**/*.net.sumocfg
 **/testMaps/**/routes.alt.xml
 **/testMaps/**/routes.xml
+**/testMaps/**/trips*.xml
 **/testMaps/**/out.xml
 **/testMaps/**/lad_out.xml
