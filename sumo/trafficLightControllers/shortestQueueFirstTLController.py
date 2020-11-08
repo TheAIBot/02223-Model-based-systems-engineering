@@ -44,7 +44,7 @@ class shortestQueueFirstLightController():
         for tLightId in self.tLightIds:
             sim.trafficlight.setPhase(tLightId, self.phase_vGreen_hRed)
 
-    def updateLights(self, sim):
+    def updateLights(self, sim, ticks):
         for tLightId in self.tLightIds:
 
             # get current traffic light phase

@@ -5,29 +5,42 @@ import simulator as sim
 import trafficLightControllers.staticLights as staticLightCtrl
 import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
 import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
+import trafficLightControllers.randomTLController as randomLightCtrl
+
 
 def test_map(tester, mapPath):
     # normal traffic lights using phase
     staticSim = sim.SumoSim(mapPath, staticLightCtrl.staticTrafficLightController())
     staticTime = staticSim.run()
 
+    # dynamic traffic lights using random green phases
+    randomSim = sim.SumoSim(mapPath, randomLightCtrl.randomLightController())
+    randomTime = randomSim.run()
+
     # dynamic traffic lights using largest queue first algorithm
     largestQueueFirstSim = sim.SumoSim(mapPath, largestQueueFirstLightCtrl.largestQueueFirstLightController())
     largestQueueFirstTime = largestQueueFirstSim.run()
 
-    # dynamic traffic lights using shortest queue first algorithm (not yet working correctly)
+    # dynamic traffic lights using shortest queue first algorithm
     shortestQueueFirstSim = sim.SumoSim(mapPath, shortestQueueFirstLightCtrl.shortestQueueFirstLightController())
     shortestQueueFirstTime = shortestQueueFirstSim.run()
 
     print_results(staticTime, "static")
+    print_results(randomTime, "random green phase")
     print_results(largestQueueFirstTime, "largest queue first")
     print_results(shortestQueueFirstTime, "shortest queue first")
 
+    tester.assertTrue(staticTime.getPassengerWaitingTime() >= randomTime.getPassengerWaitingTime())
+    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= randomTime.getEmergencyWaitingTime())
+
     tester.assertTrue(staticTime.getPassengerWaitingTime() >= largestQueueFirstTime.getPassengerWaitingTime())
     tester.assertTrue(staticTime.getEmergencyWaitingTime() >= largestQueueFirstTime.getEmergencyWaitingTime())
+
     tester.assertTrue(staticTime.getPassengerWaitingTime() >= shortestQueueFirstTime.getPassengerWaitingTime())
     tester.assertTrue(staticTime.getEmergencyWaitingTime() >= shortestQueueFirstTime.getEmergencyWaitingTime())
+
     tester.assertEqual(0, staticTime.getCollisionsCount())
+    tester.assertEqual(0, randomTime.getCollisionsCount())
     tester.assertEqual(0, largestQueueFirstTime.getCollisionsCount())
     tester.assertEqual(0, shortestQueueFirstTime.getCollisionsCount())
 
