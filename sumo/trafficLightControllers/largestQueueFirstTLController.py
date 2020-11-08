@@ -89,7 +89,7 @@ class largestQueueFirstLightController():
                     mostTrafficNum = vechNum
                     mostTrafficDetector = detectorId
 
-            print(f"Most trafficated detector: {mostTrafficDetector}, Vehicles on detector: {mostTrafficNum}, Current phase: " + curPhaseStr)
+            #print(f"Most trafficated detector: {mostTrafficDetector}, Vehicles on detector: {mostTrafficNum}, Current phase: " + curPhaseStr)
 
             if  mostTrafficDetector == dectTopId or mostTrafficDetector == dectBottomId:
                 # prioritize vertical traffic

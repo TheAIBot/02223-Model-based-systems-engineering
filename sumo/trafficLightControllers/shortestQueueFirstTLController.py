@@ -81,15 +81,15 @@ class shortestQueueFirstLightController():
             # find out which lane that has the least amount of traffic on it.
             # If none we just take the left as a defualt.
             leastTrafficDetector = dectLeftId
-            leastTrafficNum = 0
+            leastTrafficNum = 100
 
             for detectorId in detectors:
                 vechNum = sim.lanearea.getLastStepVehicleNumber(detectorId)
                 if vechNum > 0 and vechNum < leastTrafficNum:
-                    leastTrafficNum = vechNum
                     leastTrafficDetector = detectorId
-
-            print(f"Least trafficated detector: {leastTrafficDetector}, Vehicles on detector: {leastTrafficNum}, Current phase: " + curPhaseStr)
+                    leastTrafficNum = vechNum
+                
+            #print(f"Least trafficated detector: {leastTrafficDetector}, Vehicles on detector: {leastTrafficNum}, Current phase: " + curPhaseStr)
 
             if leastTrafficDetector == dectTopId or leastTrafficDetector == dectBottomId:
                 # prioritize vertical traffic

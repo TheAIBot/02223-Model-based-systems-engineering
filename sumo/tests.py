@@ -16,20 +16,20 @@ def test_map(tester, mapPath):
     largestQueueFirstTime = largestQueueFirstSim.run()
 
     # dynamic traffic lights using shortest queue first algorithm (not yet working correctly)
-    #shortestQueueFirstSim = sim.SumoSim(mapPath, shortestQueueFirstLightCtrl.shortestQueueFirstLightController())
-    #shortestQueueFirstTime = shortestQueueFirstSim.run()
+    shortestQueueFirstSim = sim.SumoSim(mapPath, shortestQueueFirstLightCtrl.shortestQueueFirstLightController())
+    shortestQueueFirstTime = shortestQueueFirstSim.run()
 
     print_results(staticTime, "static")
     print_results(largestQueueFirstTime, "largest queue first")
-    #print_results(shortestQueueFirstTime, "shortest queue first")
+    print_results(shortestQueueFirstTime, "shortest queue first")
 
     tester.assertTrue(staticTime.getPassengerWaitingTime() >= largestQueueFirstTime.getPassengerWaitingTime())
     tester.assertTrue(staticTime.getEmergencyWaitingTime() >= largestQueueFirstTime.getEmergencyWaitingTime())
-    #tester.assertTrue(staticTime.getPassengerWaitingTime() >= shortestQueueFirstTime.getPassengerWaitingTime())
-    #tester.assertTrue(staticTime.getEmergencyWaitingTime() >= shortestQueueFirstTime.getEmergencyWaitingTime())
+    tester.assertTrue(staticTime.getPassengerWaitingTime() >= shortestQueueFirstTime.getPassengerWaitingTime())
+    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= shortestQueueFirstTime.getEmergencyWaitingTime())
     tester.assertEqual(0, staticTime.getCollisionsCount())
     tester.assertEqual(0, largestQueueFirstTime.getCollisionsCount())
-    #tester.assertEqual(0, shortestQueueFirstTime.getCollisionsCount())
+    tester.assertEqual(0, shortestQueueFirstTime.getCollisionsCount())
 
 
 def print_results(time, title):
