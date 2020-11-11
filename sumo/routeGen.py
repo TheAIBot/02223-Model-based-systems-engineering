@@ -45,3 +45,9 @@ def genRoutesFromTrips(mapFilepath, tripFiles):
     routerPath = os.path.join(os.environ["SUMO_HOME"], "bin", "duarouter")
     subprocess.run([routerPath, "-n", mapFilepath, "--route-files", ",".join(tripFiles), "--no-step-log", "--seed", "56",  "--additional-files", vehicleTypePath, "-o", routeFilepath, "--ignore-errors", "true", "--no-warnings", "true"])
     return routeFilepath
+
+def generateRoutes(mapFilepath, carsPerGen, genCount, throughputMultiplier):
+    tripFiles = []
+    for i in range(genCount):
+        tripFiles.append(genRandomTrips(mapFilepath, i, carsPerGen, throughputMultiplier))
+    return os.path.basename(genRoutesFromTrips(mapFilepath, tripFiles))

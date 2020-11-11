@@ -8,11 +8,11 @@ import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFi
 
 def test_map(tester, mapPath):
     # normal traffic lights using phase
-    staticSim = sim.SumoSim(mapPath, staticLightCtrl.staticTrafficLightController())
+    staticSim = sim.withRandomTraffic(mapPath, 0.25, staticLightCtrl.staticTrafficLightController())
     staticTime = staticSim.run()
 
     # dynamic traffic lights using largest queue first algorithm
-    largestQueueFirstSim = sim.SumoSim(mapPath, largestQueueFirstLightCtrl.largestQueueFirstLightController())
+    largestQueueFirstSim = sim.withRandomTraffic(mapPath, 0.25, largestQueueFirstLightCtrl.largestQueueFirstLightController())
     largestQueueFirstTime = largestQueueFirstSim.run()
 
     # dynamic traffic lights using shortest queue first algorithm (not yet working correctly)
