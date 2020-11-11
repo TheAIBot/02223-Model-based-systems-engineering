@@ -22,11 +22,11 @@ else:
 from sumolib import checkBinary  # noqa
 import traci  # noqa
 
-
-
-def withRandomTraffic(mapFilepath, trafficThroughputMultiplier, trafficLightController):
+def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.25):
     routeFile = routeGen.generateRoutes(mapFilepath, 50, 10, trafficThroughputMultiplier)
+    return createSimSumoConfig(mapFilepath, routeFile)
 
+def createSimSumoConfig(mapFilepath, routeFile):
     mapFolder = os.path.dirname(mapFilepath)
     mapName = Path.Path(mapFilepath).stem
     mapConfigFilepath = os.path.join(mapFolder, mapName + ".sumocfg")
@@ -39,8 +39,7 @@ def withRandomTraffic(mapFilepath, trafficThroughputMultiplier, trafficLightCont
         print("    </input>", file=mapConfig)
         print("</configuration>", file=mapConfig)
 
-    return SumoSim(mapConfigFilepath, trafficLightController)
-
+    return mapConfigFilepath
 
 class SumoSim():
 

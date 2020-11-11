@@ -7,29 +7,23 @@ import trafficLightControllers.largestQueueFirstTLController as largestQueueFirs
 import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
 
 def test_map(tester, mapPath):
+    mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapPath)
+
     # normal traffic lights using phase
-    staticSim = sim.withRandomTraffic(mapPath, 0.25, staticLightCtrl.staticTrafficLightController())
+    staticSim = sim.SumoSim(mapConfigFile, staticLightCtrl.staticTrafficLightController())
     staticTime = staticSim.run()
 
     # dynamic traffic lights using largest queue first algorithm
-    largestQueueFirstSim = sim.withRandomTraffic(mapPath, 0.25, largestQueueFirstLightCtrl.largestQueueFirstLightController())
-    largestQueueFirstTime = largestQueueFirstSim.run()
-
-    # dynamic traffic lights using shortest queue first algorithm (not yet working correctly)
-    #shortestQueueFirstSim = sim.SumoSim(mapPath, shortestQueueFirstLightCtrl.shortestQueueFirstLightController())
-    #shortestQueueFirstTime = shortestQueueFirstSim.run()
+    dynamicSim = sim.SumoSim(mapConfigFile, largestQueueFirstLightCtrl.largestQueueFirstLightController())
+    dynamicTime = dynamicSim.run()
 
     print_results(staticTime, "static")
-    print_results(largestQueueFirstTime, "largest queue first")
-    #print_results(shortestQueueFirstTime, "shortest queue first")
+    print_results(dynamicTime, "largest queue first")
 
-    tester.assertTrue(staticTime.getPassengerWaitingTime() >= largestQueueFirstTime.getPassengerWaitingTime())
-    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= largestQueueFirstTime.getEmergencyWaitingTime())
-    #tester.assertTrue(staticTime.getPassengerWaitingTime() >= shortestQueueFirstTime.getPassengerWaitingTime())
-    #tester.assertTrue(staticTime.getEmergencyWaitingTime() >= shortestQueueFirstTime.getEmergencyWaitingTime())
+    tester.assertTrue(staticTime.getPassengerWaitingTime() >= dynamicTime.getPassengerWaitingTime())
+    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= dynamicTime.getEmergencyWaitingTime())
     tester.assertEqual(0, staticTime.getCollisionsCount())
-    tester.assertEqual(0, largestQueueFirstTime.getCollisionsCount())
-    #tester.assertEqual(0, shortestQueueFirstTime.getCollisionsCount())
+    tester.assertEqual(0, dynamicTime.getCollisionsCount())
 
 
 def print_results(time, title):
