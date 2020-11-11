@@ -27,7 +27,7 @@ import random
 # Phase 7: vertical orange, horizontal red    (10s)
 #
 
-class randomLightController():
+class ctrl():
 
     def init(self, sim):
         self.phase_vGreen_hRed  = 0 # default, i.e. resting in vertical lane green

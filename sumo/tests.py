@@ -2,48 +2,55 @@
 
 import unittest
 import simulator as sim
-import trafficLightControllers.staticLights as staticLightCtrl
-import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
-import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
-import trafficLightControllers.randomTLController as randomLightCtrl
+from trafficLightControllers import *
 
-
-def test_map(tester, mapPath):
+modules = {
     # normal traffic lights using phase
-    staticSim = sim.SumoSim(mapPath, staticLightCtrl.staticTrafficLightController())
-    staticTime = staticSim.run()
+    "static": staticLights,
 
     # dynamic traffic lights using random green phases
-    randomSim = sim.SumoSim(mapPath, randomLightCtrl.randomLightController())
-    randomTime = randomSim.run()
+    "random": randomTLController,
 
     # dynamic traffic lights using largest queue first algorithm
-    largestQueueFirstSim = sim.SumoSim(mapPath, largestQueueFirstLightCtrl.largestQueueFirstLightController())
-    largestQueueFirstTime = largestQueueFirstSim.run()
+    "lqf": largestQueueFirstTLController,
 
     # dynamic traffic lights using shortest queue first algorithm
-    shortestQueueFirstSim = sim.SumoSim(mapPath, shortestQueueFirstLightCtrl.shortestQueueFirstLightController())
-    shortestQueueFirstTime = shortestQueueFirstSim.run()
+    "sqf": shortestQueueFirstTLController,
+}
 
-    print_results(staticTime, "static")
-    print_results(randomTime, "random green phase")
-    print_results(largestQueueFirstTime, "largest queue first")
-    print_results(shortestQueueFirstTime, "shortest queue first")
+friendly = {
+    "random": "random green phase",
+    "lqf": "largest queue first",
+    "sqf": "shortest queue first",
+}
 
-    tester.assertTrue(staticTime.getPassengerWaitingTime() >= randomTime.getPassengerWaitingTime())
-    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= randomTime.getEmergencyWaitingTime())
+def test_map(tester, mapPath):
+    results = {}
+    for name, module in modules.items():
+        result = sim.SumoSim(mapPath, module.ctrl()).run()
+        results[name] = result
 
-    tester.assertTrue(staticTime.getPassengerWaitingTime() >= largestQueueFirstTime.getPassengerWaitingTime())
-    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= largestQueueFirstTime.getEmergencyWaitingTime())
+    for name, result in results.items():
+        print_results(result, friendly.get(name, name))
 
-    tester.assertTrue(staticTime.getPassengerWaitingTime() >= shortestQueueFirstTime.getPassengerWaitingTime())
-    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= shortestQueueFirstTime.getEmergencyWaitingTime())
+    # The two loops are separated to ensure that results are always printed.
 
-    tester.assertEqual(0, staticTime.getCollisionsCount())
-    tester.assertEqual(0, randomTime.getCollisionsCount())
-    tester.assertEqual(0, largestQueueFirstTime.getCollisionsCount())
-    tester.assertEqual(0, shortestQueueFirstTime.getCollisionsCount())
-
+    for name, result in results.items():
+        tester.assertEqual(
+            0,
+            result.getCollisionsCount(),
+            f"{name} has collisions in {mapPath}"
+        )
+        tester.assertGreaterEqual(
+            results["static"].getPassengerWaitingTime(),
+            result.getPassengerWaitingTime(),
+            f"{name} is slower than static for passengers in {mapPath}"
+        )
+        tester.assertGreaterEqual(
+            results["static"].getEmergencyWaitingTime(),
+            result.getEmergencyWaitingTime(),
+            f"{name} is slower than static for emergency in {mapPath}"
+        )
 
 def print_results(time, title):
     print()

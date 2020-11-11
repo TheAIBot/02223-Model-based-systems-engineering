@@ -1,4 +1,4 @@
-class staticTrafficLightController():
+class ctrl():
     def init(self, sim):
         pass
     
