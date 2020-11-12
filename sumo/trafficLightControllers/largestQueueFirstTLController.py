@@ -17,7 +17,7 @@ class ctrl():
             for group in tlIntersection.getTrafficLightGroups():
                 queueLength = 0
                 for laneDetectorID in group.getLaneDetectorIDs():
-                    queueLength += sim.lanearea.getLastStepVehicleNumber(laneDetectorID)
+                    queueLength = max(queueLength, sim.lanearea.getLastStepVehicleNumber(laneDetectorID))
                 
                 if queueLength > longestQueue or longestQueueGroup is None:
                     longestQueue = queueLength
