@@ -2,29 +2,58 @@
 
 import unittest
 import simulator as sim
-import trafficLightControllers.staticLights as staticLightCtrl
-import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
-import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
+from trafficLightControllers import *
+
+modules = {
+    # normal traffic lights using phase
+    "static": staticLights,
+
+    # dynamic traffic lights using random green phases
+    "random": randomTLController,
+
+    # dynamic traffic lights using largest queue first algorithm
+    "lqf": largestQueueFirstTLController,
+
+    # dynamic traffic lights using shortest queue first algorithm
+    "sqf": shortestQueueFirstTLController,
+}
+
+friendly = {
+    "random": "random green phase",
+    "lqf": "largest queue first",
+    "sqf": "shortest queue first",
+}
 
 def test_map(tester, mapPath):
     mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapPath)
 
-    # normal traffic lights using phase
-    staticSim = sim.SumoSim(mapConfigFile, staticLightCtrl.staticTrafficLightController())
-    staticTime = staticSim.run()
+    results = {}
+    for name, module in modules.items():
+        result = sim.SumoSim(mapConfigFile, module.ctrl()).run()
+        results[name] = result
+        
 
-    # dynamic traffic lights using largest queue first algorithm
-    dynamicSim = sim.SumoSim(mapConfigFile, largestQueueFirstLightCtrl.largestQueueFirstLightController())
-    dynamicTime = dynamicSim.run()
+    for name, result in results.items():
+        print_results(result, friendly.get(name, name))
 
-    print_results(staticTime, "static")
-    print_results(dynamicTime, "largest queue first")
+    # The two loops are separated to ensure that results are always printed.
 
-    tester.assertTrue(staticTime.getPassengerWaitingTime() >= dynamicTime.getPassengerWaitingTime())
-    tester.assertTrue(staticTime.getEmergencyWaitingTime() >= dynamicTime.getEmergencyWaitingTime())
-    tester.assertEqual(0, staticTime.getCollisionsCount())
-    tester.assertEqual(0, dynamicTime.getCollisionsCount())
-
+    for name, result in results.items():
+        tester.assertEqual(
+            0,
+            result.getCollisionsCount(),
+            f"{name} has collisions in {mapPath}"
+        )
+        tester.assertGreaterEqual(
+            results["static"].getPassengerWaitingTime(),
+            result.getPassengerWaitingTime(),
+            f"{name} is slower than static for passengers in {mapPath}"
+        )
+        tester.assertGreaterEqual(
+            results["static"].getEmergencyWaitingTime(),
+            result.getEmergencyWaitingTime(),
+            f"{name} is slower than static for emergency in {mapPath}"
+        )
 
 def print_results(time, title):
     print()
@@ -56,6 +85,10 @@ class TestSmallMaps(unittest.TestCase):
 
     def test_4_4TL4W_Intersection(self):
         test_map(self, "testMaps/4-4TL4W-Intersection/network.net.xml")
+    
+    def test_4_4TL4W_Intersection_large(self):
+        test_map(self, "testMaps/4-4TL4W-Intersection-LARGE/network.net.xml")
+
 
 
 if __name__ == '__main__':

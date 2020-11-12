@@ -1,3 +1,5 @@
+import random
+
 # TRAFFIC LIGHT AND LANE DETECTOR INFORMATION:
 #
 # Every test map should comply after these rules.
@@ -45,6 +47,7 @@ class ctrl():
             sim.trafficlight.setPhase(tLightId, self.phase_vGreen_hRed)
 
     def updateLights(self, sim, ticks):
+        trafficDetector = ""
         for tLightId in self.tLightIds:
 
             # get current traffic light phase
@@ -73,25 +76,17 @@ class ctrl():
             dectRightId = tLightId + "_right"
             dectTopId = tLightId + "_top"
             dectBottomId = tLightId + "_bottom"
+            
+            if ticks % 50 == 0:
+                rand = random.randint(0, 1)
+                if rand == 0:
+                    trafficDetector = dectLeftId
+                else:
+                    trafficDetector = dectTopId
 
-            # get all detector id's in the simulation
-            detectors = sim.lanearea.getIDList()
+            #print(f"Most trafficated detector: {mostTrafficDetector}, Vehicles on detector: {mostTrafficNum}, Current phase: " + curPhaseStr)
 
-            # loop through all of the registered lane detectors,
-            # find out which lane that has the least amount of traffic on it.
-            # If none we just take the left as a defualt.
-            leastTrafficDetector = dectLeftId
-            leastTrafficNum = 100
-
-            for detectorId in detectors:
-                vechNum = sim.lanearea.getLastStepVehicleNumber(detectorId)
-                if vechNum > 0 and vechNum < leastTrafficNum:
-                    leastTrafficDetector = detectorId
-                    leastTrafficNum = vechNum
-                
-            #print(f"Least trafficated detector: {leastTrafficDetector}, Vehicles on detector: {leastTrafficNum}, Current phase: " + curPhaseStr)
-
-            if leastTrafficDetector == dectTopId or leastTrafficDetector == dectBottomId:
+            if  trafficDetector == dectTopId or trafficDetector == dectBottomId:
                 # prioritize vertical traffic
                 if curPhase == self.phase_vGreen_hRed:    # if we are already green, make sure we stay green
                     sim.trafficlight.setPhase(tLightId, self.phase_vGreen_hRed) 
@@ -107,7 +102,7 @@ class ctrl():
                     sim.trafficlight.setPhase(tLightId, self.phase_vRed_hRed_2)
                 elif curPhase == self.phase_vOrange_hRed: # if vertical is orange, go to green quick
                     sim.trafficlight.setPhase(tLightId, self.phase_vGreen_hRed)
-            elif leastTrafficDetector == dectLeftId or leastTrafficDetector == dectRightId:
+            elif trafficDetector == dectLeftId or trafficDetector == dectRightId:
                 # prioritize horizontal traffic
                 if curPhase == self.phase_vGreen_hRed:    # If vertical is green, make it go yellow quick
                     sim.trafficlight.setPhase(tLightId, self.phase_vYellow_hRed)

@@ -1,6 +1,6 @@
 from trafficLightIntersection import TrafficLightIntersection
 
-class largestQueueFirstLightController():
+class ctrl():
 
     def init(self, sim):
         # get traffic light ids for this simulation
@@ -10,7 +10,7 @@ class largestQueueFirstLightController():
         for tlID in self.tLightIds:
             self.tlIntersections.append(TrafficLightIntersection(tlID, sim))
 
-    def updateLights(self, sim):
+    def updateLights(self, sim, ticks):
         for tlIntersection in self.tlIntersections:
             longestQueue = 0
             longestQueueGroup = None
