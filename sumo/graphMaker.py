@@ -3,6 +3,7 @@
 import os
 import matplotlib.pyplot as plt
 import numpy as np
+import subprocess
 
 import simulator as simu
 import trafficLightControllers.staticLights as staticLightCtrl
@@ -55,6 +56,16 @@ def makeComparisonVehicleTimeHist(mapPath, ctrls):
 
     mapGraphPath = getGraphSavePath(mapPath)
     plt.savefig(os.path.join(mapGraphPath, "cmp-vehicle-time-hist.pdf"))
+
+def makeRandomMap(mapSavePath, mapName):
+    if not os.path.isdir(mapSavePath):
+        os.mkdir(mapSavePath)
+    mapFilepath = os.path.join(mapSavePath, mapName)
+    #netgenerate.py
+    #generateTLSE2Detectors.py
+    #tlsCycleAdaptation.py
+    #tlsCoordinator.py maybe?
+
 
 makeComparisonVehicleTimeHist("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
 
