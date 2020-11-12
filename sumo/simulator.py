@@ -12,6 +12,8 @@ import pathlib as Path
 import routeGen
 from simMeasurements import SimMeasurements
 
+random.seed(864)
+
 # we need to import python modules from the $SUMO_HOME/tools directory
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
