@@ -65,6 +65,7 @@ class TrafficLightIntersection():
             currPhaseIdx = sim.trafficlight.getPhase(self.tlID)
 
             if currPhaseIdx == self.targetGroup.greenPhaseIdx:
+                self.targetGroup = None
                 return
 
             nextPhaseIdx = currPhaseIdx
@@ -85,3 +86,6 @@ class TrafficLightIntersection():
 
     def setGroupAsGreen(self, group):
         self.targetGroup = group
+
+    def getTrafficLightGroups(self):
+        return self.tlGroups
