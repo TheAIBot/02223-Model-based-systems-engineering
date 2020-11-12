@@ -5,6 +5,7 @@ import subprocess
 import random as rng
 import xml.etree.ElementTree as xmlReader
 
+
 def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier):
     tripsStartTime = round(rng.uniform(0, 1000))
     throughputInc = 1.0 / throughputMultiplier

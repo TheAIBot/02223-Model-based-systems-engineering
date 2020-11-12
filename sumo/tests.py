@@ -82,6 +82,10 @@ class TestSmallMaps(unittest.TestCase):
 
     def test_4_4TL4W_Intersection(self):
         test_map(self, "testMaps/4-4TL4W-Intersection/network.net.xml")
+    
+    def test_4_4TL4W_Intersection_large(self):
+        test_map(self, "testMaps/4-4TL4W-Intersection-LARGE/network.net.xml")
+
 
 
 if __name__ == '__main__':

@@ -1,0 +1,88 @@
+<additional>
+   <laneAreaDetector id="TL-TL_top" lane="-gneE30_0" 
+   pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+
+   <laneAreaDetector id="TL-TL_left" lane="-gneE29_0" 
+  pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="TL-TL_right" lane="gneE28_0" 
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="TL-TL_bottom" lane="gneE25_0" 
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+
+
+
+   <laneAreaDetector id="TR-TL_top" lane="-gneE31_0" 
+   pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+
+   <laneAreaDetector id="TR-TL_bottom" lane="gneE26_0" 
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="TR-TL_right" lane="-gneE27_0"
+   pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="TR-TL_left" lane="-gneE28_0" 
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+
+
+
+   <laneAreaDetector id="BL-TL_top" lane="-gneE25_0" 
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+
+   <laneAreaDetector id="BL-TL_left" lane="gneE24_0"
+   pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="BL-TL_bottom" lane="gneE18_0"
+   pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="BL-TL_right" lane="-gneE19_0" 
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+
+
+
+   <laneAreaDetector id="BR-TL_left" lane="gneE19_0"
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+
+   <laneAreaDetector id="BR-TL_top" lane="-gneE26_0" 
+   pos="85" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="BR-TL_right" lane="gneE23_0"
+   pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+   <laneAreaDetector id="BR-TL_bottom" lane="-gneE20_0" 
+   pos="92" length="300" 
+   friendlyPos="true" freq="1000" file="lad_out.xml"
+   timeThreshold="1" speedThreshold="5" jamThreshold="10" />
+  
+</additional>
