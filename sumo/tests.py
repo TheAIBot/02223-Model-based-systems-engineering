@@ -25,10 +25,13 @@ friendly = {
 }
 
 def test_map(tester, mapPath):
+    mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapPath)
+
     results = {}
     for name, module in modules.items():
-        result = sim.SumoSim(mapPath, module.ctrl()).run()
+        result = sim.SumoSim(mapConfigFile, module.ctrl()).run()
         results[name] = result
+        
 
     for name, result in results.items():
         print_results(result, friendly.get(name, name))
