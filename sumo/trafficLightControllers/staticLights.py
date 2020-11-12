@@ -4,3 +4,6 @@ class ctrl():
     
     def updateLights(self, sim, ticks):
         pass
+
+    def getName(self):
+        return "Static"

@@ -19,25 +19,44 @@ def makeVehicleTimeHist(mapGraphPath: str, mapName: str, data: SimMeasurements):
         
     plt.savefig(os.path.join(mapGraphPath, "vehicle-time-hist.pdf"))
 
+def getCtrlsResults(mapPath, ctrls):
+    mapConfigFile = simu.createSimSumoConfigWithRandomTraffic(mapPath)
 
-mapPath = "testMaps/1-3TL3W-Intersection/network.net.xml"
-tlCtrl = staticLightCtrl.staticTrafficLightController()
+    results = []
+    for ctrl in ctrls:
+        sSim = simu.SumoSim(mapConfigFile, ctrl)
+        results.append(sSim.run())
 
+    return results
 
+def getGraphSavePath(mapPath):
+    mapName = os.path.basename(os.path.dirname(mapPath))
+    mapGraphPath = os.path.join("graphs", mapName)
 
-mapName = os.path.basename(os.path.dirname(mapPath))
-mapGraphPath = os.path.join("graphs", mapName)
+    if not os.path.isdir("graphs"):
+        os.mkdir("graphs")
 
-if not os.path.isdir("graphs"):
-    os.mkdir("graphs")
+    if not os.path.isdir(mapGraphPath):
+        os.mkdir(mapGraphPath)
 
-if not os.path.isdir(mapGraphPath):
-    os.mkdir(mapGraphPath)
+    return mapGraphPath
 
-sim = simu.SumoSim(mapPath, tlCtrl)
-simData = sim.run()
+def makeComparisonVehicleTimeHist(mapPath, ctrls):
+    for result in getCtrlsResults(mapPath, ctrls):
+        times = []
+        for veh in result.vehiclesData.values():
+            times.append(veh.getTravelTime())
 
-makeVehicleTimeHist(mapGraphPath, mapPath, simData)
+        plt.hist(times, density = True, bins = 30, label = result.getControllerName())
+
+    plt.legend(loc="upper left")
+    plt.title("Mean vehicle travel time histogram")
+    plt.xlabel("Time in steps")
+
+    mapGraphPath = getGraphSavePath(mapPath)
+    plt.savefig(os.path.join(mapGraphPath, "cmp-vehicle-time-hist.pdf"))
+
+makeComparisonVehicleTimeHist("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
 
 
 

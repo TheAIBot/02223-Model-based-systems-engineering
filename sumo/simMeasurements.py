@@ -1,11 +1,12 @@
 from vehicleData import VehicleData
 
 class SimMeasurements():
-    def __init__(self, timestep):
+    def __init__(self, timestep, tlCtrl):
         self.timeStep = timestep
         self.time = 0
         self.vehiclesData = dict()
         self.vehicleCollisionCount = 0
+        self.ctrlName = tlCtrl.getName()
 
     def update(self, sim):
         for vehicleID in sim.vehicle.getIDList():
@@ -50,3 +51,6 @@ class SimMeasurements():
 
     def getCollisionsCount(self):
         return self.vehicleCollisionCount
+
+    def getControllerName(self):
+        return self.ctrlName

@@ -19,3 +19,6 @@ class ctrl():
 
         for tlIntersection in self.tlIntersections:
             tlIntersection.update(sim)
+
+    def getName(self):
+        return "Random"
