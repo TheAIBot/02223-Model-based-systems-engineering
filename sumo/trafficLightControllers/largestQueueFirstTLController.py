@@ -8,7 +8,9 @@ class ctrl():
 
         self.tlIntersections = []
         for tlID in self.tLightIds:
-            self.tlIntersections.append(TrafficLightIntersection(tlID, sim))
+            tl = TrafficLightIntersection(tlID, sim)
+            if len(tl.getTrafficLightGroups()) > 0:
+                self.tlIntersections.append(tl)
 
     def updateLights(self, sim, ticks):
         for tlIntersection in self.tlIntersections:
