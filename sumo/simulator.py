@@ -9,6 +9,8 @@ import optparse
 import random
 import pathlib as Path
 
+import string
+
 import routeGen
 from simMeasurements import SimMeasurements
 
@@ -47,9 +49,10 @@ class SumoSim():
 
     def __init__(self, mapConfigFilepath, trafficLightController):
         self.tlCtrl = trafficLightController
+        self.label = str(self.tlCtrl) + ''.join(random.choice(string.ascii_lowercase) for i in range(20))
 
-        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000"], label= str(self.tlCtrl))
-        self.sumoCon = traci.getConnection(str(self.tlCtrl))
+        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000"], label = self.label)
+        self.sumoCon = traci.getConnection(self.label)
 
         trafficLightController.init(self.sumoCon)
 
