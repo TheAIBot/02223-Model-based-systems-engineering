@@ -23,7 +23,7 @@ class ctrl():
                     longestQueue = queueLength
                     longestQueueGroup = group
 
-            tlIntersection.setGroupAsGreen(longestQueueGroup)
+            tlIntersection.setGroupAsGreen(longestQueueGroup, sim)
 
         for tlIntersection in self.tlIntersections:
             tlIntersection.update(sim)

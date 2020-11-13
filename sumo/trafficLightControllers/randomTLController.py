@@ -15,7 +15,7 @@ class ctrl():
         if ticks % 50 == 0:
             for tlIntersection in self.tlIntersections:
                 rngGroup = random.randint(0, len(tlIntersection.getTrafficLightGroups()) - 1)
-                tlIntersection.setGroupAsGreen(tlIntersection.getTrafficLightGroups()[rngGroup])
+                tlIntersection.setGroupAsGreen(tlIntersection.getTrafficLightGroups()[rngGroup], sim)
 
         for tlIntersection in self.tlIntersections:
             tlIntersection.update(sim)
