@@ -146,4 +146,5 @@ _NCrunch*
 **/testMaps/**/trips*.xml
 **/testMaps/**/out.xml
 **/testMaps/**/lad_out.xml
+sumo/random_map
 /sumo/graphs/**

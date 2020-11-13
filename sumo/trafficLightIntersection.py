@@ -27,11 +27,11 @@ def getLinkGroups(tlID, program, sim):
 def getLinkGroupLaneDetectors(tlID, linkGroups, sim):
     groupsLaneDetectors = []
     links = sim.trafficlight.getControlledLinks(tlID)
-    laneDetectorNames = sim.lanearea.getIDList()
+    laneDetectorNames = sim.multientryexit.getIDList()
 
     laneDetectorNameIDs = []
     for laneDName in laneDetectorNames:
-        laneDetectorNameIDs.append(sim.lanearea.getLaneID(laneDName))
+        laneDetectorNameIDs.append(sim.multientryexit.getLaneID(laneDName))
 
     for group in linkGroups:
         groupLaneDetectors = []
