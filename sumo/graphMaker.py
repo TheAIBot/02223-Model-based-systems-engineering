@@ -67,7 +67,7 @@ def createLaneDetectors(mapFilepath, mapFolderPath):
     laneDetectorFilePath = os.path.join(mapFolderPath, "lanedetector.xml")
     exePath = os.path.join(os.environ["SUMO_HOME"], "tools/output", "generateTLSE3Detectors.py")
     print(exePath)
-    procRes = subprocess.run(["python", exePath, "-n", mapFilepath, "-o", laneDetectorFilePath, "-l", "20", "--joined"])
+    procRes = subprocess.run(["python", exePath, "-n", mapFilepath, "-o", laneDetectorFilePath, "-l", "20"])
     if procRes.returncode != 0:
         raise Exception("Executing generateTLSE3Detectors.py failed.")
 

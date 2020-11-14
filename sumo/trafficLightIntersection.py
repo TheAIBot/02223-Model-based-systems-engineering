@@ -28,20 +28,26 @@ def getLinkGroupLaneDetectors(tlID, linkGroups, sim):
     groupsLaneDetectors = []
     links = sim.trafficlight.getControlledLinks(tlID)
     laneDetectorNames = sim.multientryexit.getIDList()
-
-    laneDetectorNameIDs = []
-    for laneDName in laneDetectorNames:
-        laneDetectorNameIDs.append(sim.multientryexit.getLaneID(laneDName))
+    trafficLightDetectors = dict()
+    for detectorName in laneDetectorNames:
+        dwa = detectorName.split("_")
+        detectortlID = dwa[1]
+        if detectortlID == tlID:
+            roadID = dwa[2]
+            if roadID not in trafficLightDetectors:
+                trafficLightDetectors[roadID] = []
+            trafficLightDetectors[roadID].append(detectorName)
 
     for group in linkGroups:
         groupLaneDetectors = []
         for gIdx in group:
             if len(links[gIdx]) > 0:
                 incommingLane = links[gIdx][0][0]
-                if incommingLane in laneDetectorNameIDs:
-                    laneDetectorName = laneDetectorNames[laneDetectorNameIDs.index(incommingLane)]
-                    if laneDetectorName not in groupLaneDetectors:
-                        groupLaneDetectors.append(laneDetectorName)
+                incommingRoad = incommingLane.split("_")[0]
+                if incommingRoad in trafficLightDetectors:
+                    for detector in trafficLightDetectors[incommingRoad]:
+                        if detector not in groupLaneDetectors:
+                            groupLaneDetectors.append(detector)
         groupsLaneDetectors.append(groupLaneDetectors)
 
     return groupsLaneDetectors
