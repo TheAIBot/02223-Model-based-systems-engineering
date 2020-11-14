@@ -9,7 +9,7 @@ import optparse
 import random
 import pathlib as Path
 
-import routeGen
+import sumoTools
 from simMeasurements import SimMeasurements
 
 random.seed(864)
@@ -24,9 +24,14 @@ else:
 from sumolib import checkBinary  # noqa
 import traci  # noqa
 
-def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.25):
-    routeFile = routeGen.generateRoutes(mapFilepath, 50, 10, trafficThroughputMultiplier)
-    return createSimSumoConfig(mapFilepath, routeFile)
+def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.25, additionalTrafficlighPhases = False):
+    routeFile = sumoTools.generateRoutes(mapFilepath, 50, 10, trafficThroughputMultiplier)
+    return createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = additionalTrafficlighPhases)
+
+def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = False):
+    additionalFiles = ["lanedetector.xml"]
+    if additionalTrafficlighPhases:
+        additionalFiles.append("trafficlightPhases.xml")
 
 def createSimSumoConfig(mapFilepath, routeFile):
     mapFolder = os.path.dirname(mapFilepath)
@@ -37,7 +42,7 @@ def createSimSumoConfig(mapFilepath, routeFile):
         print("    <input>", file=mapConfig)
         print("        <net-file value=\"{}\"/>".format(os.path.basename(mapFilepath)), file=mapConfig)
         print("        <route-files value=\"{}\"/>".format(routeFile), file=mapConfig)
-        print("        <additional-files value=\"{}\"/>".format("lanedetector.xml"), file=mapConfig)
+        print("        <additional-files value=\"{}\"/>".format(str.join(", ", additionalFiles)), file=mapConfig)
         print("    </input>", file=mapConfig)
         print("</configuration>", file=mapConfig)
 

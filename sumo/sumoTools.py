@@ -22,7 +22,6 @@ def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier):
     
     return tripFilepath
 
-
 def makeTripsCompatible(tripFiles):
     """A trip files designates a trip ID for each trip starting from 0.
     Duplicate trip ID is not allowed to this method will rewrite each
@@ -30,14 +29,12 @@ def makeTripsCompatible(tripFiles):
     tripCounter = 0
     for tripFile in tripFiles:
         tripXml = xmlReader.parse(tripFile)
-        tripRoot = tripXml.getroot()
-        for trip in tripRoot.findall("trip"):
+        for trip in tripXml.getroot().findall("trip"):
             trip.set("id", str(tripCounter))
             tripCounter += 1
 
         with open(tripFile, "wb") as mapConfig:
             tripXml.write(mapConfig)
-
 
 def genRoutesFromTrips(mapFilepath, tripFiles):
     makeTripsCompatible(tripFiles)
@@ -56,3 +53,33 @@ def generateRoutes(mapFilepath, carsPerGen, genCount, throughputMultiplier):
     for i in range(genCount):
         tripFiles.append(genRandomTrips(mapFilepath, i, carsPerGen, throughputMultiplier))
     return os.path.basename(genRoutesFromTrips(mapFilepath, tripFiles))
+
+def createRandomMap(mapFilepath):
+    exePath = os.path.join(os.environ["SUMO_HOME"], "bin", "netgenerate")
+    procRes = subprocess.run([exePath, "--rand", "-o", mapFilepath, "--rand.iterations=200", "--turn-lanes", "1", "-L", "2", "-j", "traffic_light"])
+    if procRes.returncode != 0:
+        raise Exception("Executing netgenerate failed.")
+
+def createLaneDetectors(mapFilepath):
+    mapFolderPath = os.path.dirname(mapFilepath)
+    laneDetectorFilePath = os.path.join(mapFolderPath, "lanedetector.xml")
+    exePath = os.path.join(os.environ["SUMO_HOME"], "tools/output", "generateTLSE3Detectors.py")
+    procRes = subprocess.run(["python", exePath, "-n", mapFilepath, "-o", laneDetectorFilePath, "-l", "20"])
+    if procRes.returncode != 0:
+        raise Exception("Executing generateTLSE3Detectors.py failed.")
+
+    laneDetectorXml = xmlReader.parse(laneDetectorFilePath)
+    for detector in laneDetectorXml.getroot().findall("e3Detector"):
+        detector.set("openEntry", "true")
+
+    with open(laneDetectorFilePath, "wb") as saveFile:
+            laneDetectorXml.write(saveFile)
+
+def modifyTrafficLightPhases(mapFilepath):
+    mapFolderPath = os.path.dirname(mapFilepath)
+    tlPhasesFilepath = os.path.join(mapFolderPath, "trafficlightPhases.xml")
+    routeFilepath = os.path.join(mapFolderPath, "routes.xml")
+    exePath = os.path.join(os.environ["SUMO_HOME"], "tools", "tlsCycleAdaptation.py")
+    procRes = subprocess.run(["python", exePath, "-n", mapFilepath, "-r", routeFilepath, "-o", tlPhasesFilepath])
+    if procRes.returncode != 0:
+        raise Exception("Executing tlsCycleAdaptation.py failed.")
