@@ -84,27 +84,37 @@ class TrafficLightIntersection():
 
         sim.trafficlight.subscribe(self.tlID, (tc.TL_CURRENT_PHASE,))
 
+    def findNextPhaseToTargetGroup(self, currPhaseIdx):
+        """
+        The trafficlight must go through its yellow -> red -> yellow
+        phases before it can go to its green phase. It does this by
+        sequentially going through the trafficlights phases. But
+        doing just that would mean that it may have to go through
+        other groups green phases which is not desirable. This method
+        returns the index of the next phase it should switch to while
+        skipping over other groups green phases.
+        """
+        nextPhaseIdx = currPhaseIdx
+        while "g" in self.program.phases[nextPhaseIdx].state:
+            nextPhaseIdx = (nextPhaseIdx + 1) % len(self.program.phases)
+            if nextPhaseIdx == self.targetGroup.greenPhaseIdx:
+                break
+
+        return nextPhaseIdx
+
+    def resetPhaseRemainingTime(self, phaseIdx, sim):
+        phaseDuration = self.program.phases[phaseIdx].duration
+        sim.trafficlight.setPhaseDuration(self.tlID, phaseDuration)     
+
     def update(self, sim):
         if self.targetGroup is not None:
             if self.currPhaseIdx == self.targetGroup.greenPhaseIdx:
                 self.targetGroup = None
                 return
 
-            nextPhaseIdx = self.currPhaseIdx
-            gotoNextPhase = True
-            while gotoNextPhase:
-                gotoNextPhase = False
-                for tlState in self.program.phases[nextPhaseIdx].state:
-                    if tlState == "g":
-                        nextPhaseIdx = (nextPhaseIdx + 1) % len(self.program.phases)
-                        gotoNextPhase = True
-                        break
-
-                if nextPhaseIdx == self.targetGroup.greenPhaseIdx:
-                    break
-
+            nextPhaseIdx = self.findNextPhaseToTargetGroup(self.currPhaseIdx)
             if self.currPhaseIdx != nextPhaseIdx:
-                sim.trafficlight.setPhase(self.tlID, nextPhaseIdx)
+                sim.trafficlight.setPhase(self.tlID, nextPhaseIdx)           
 
     def updateWithDataFromSumo(self, detectorData, trafficlightData):
         for group in self.tlGroups:
@@ -114,10 +124,13 @@ class TrafficLightIntersection():
 
     def setGroupAsGreen(self, group, sim):
         if self.currPhaseIdx == group.greenPhaseIdx:
-            phaseDuration = self.program.phases[group.greenPhaseIdx].duration
-            sim.trafficlight.setPhaseDuration(self.tlID, phaseDuration)
+            self.resetPhaseRemainingTime(group.greenPhaseIdx, sim)
         else:
             self.targetGroup = group
+
+    def setGroupsGreenPhaseLength(self, group, phaseLength, sim):
+        self.program.phases[group.greenPhaseIdx].duration = phaseLength
+        sim.trafficlight.setProgramLogic(self.tlID, self.program)
 
     def getTrafficLightGroups(self):
         return self.tlGroups
