@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import unittest
+import sumoTools
 import simulator as sim
 from trafficLightControllers import *
 
@@ -25,6 +26,7 @@ friendly = {
 }
 
 def test_map(tester, mapPath):
+    sumoTools.createLaneDetectors(mapPath)
     mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapPath)
 
     results = {}
