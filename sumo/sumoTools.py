@@ -60,11 +60,11 @@ def createRandomMap(mapFilepath):
     if procRes.returncode != 0:
         raise Exception("Executing netgenerate failed.")
 
-def createLaneDetectors(mapFilepath):
+def createLaneDetectors(mapFilepath, detectorLength = 20):
     mapFolderPath = os.path.dirname(mapFilepath)
     laneDetectorFilePath = os.path.join(mapFolderPath, "lanedetector.xml")
     exePath = os.path.join(os.environ["SUMO_HOME"], "tools/output", "generateTLSE3Detectors.py")
-    procRes = subprocess.run(["python", exePath, "-n", mapFilepath, "-o", laneDetectorFilePath, "-l", "20"])
+    procRes = subprocess.run(["python", exePath, "-n", mapFilepath, "-o", laneDetectorFilePath, "-l", str(detectorLength)])
     if procRes.returncode != 0:
         raise Exception("Executing generateTLSE3Detectors.py failed.")
 
