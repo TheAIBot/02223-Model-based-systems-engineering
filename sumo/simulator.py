@@ -33,7 +33,6 @@ def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = Fa
     if additionalTrafficlighPhases:
         additionalFiles.append("trafficlightPhases.xml")
 
-def createSimSumoConfig(mapFilepath, routeFile):
     mapFolder = os.path.dirname(mapFilepath)
     mapName = Path.Path(mapFilepath).stem
     mapConfigFilepath = os.path.join(mapFolder, mapName + ".sumocfg")

@@ -9,12 +9,13 @@ class SimMeasurements():
         self.ctrlName = tlCtrl.getName()
 
     def update(self, sim):
+        allSubscribedData = sim.vehicle.getAllSubscriptionResults()
         for vehicleID in sim.vehicle.getIDList():
             if vehicleID not in self.vehiclesData:
                 vehicleClass = sim.vehicle.getVehicleClass(vehicleID)
                 self.vehiclesData[vehicleID] = VehicleData(sim, vehicleID, vehicleClass, self.time)
             else:
-                self.vehiclesData[vehicleID].updateVehicleData(sim, self.timeStep)
+                self.vehiclesData[vehicleID].updateVehicleData(sim, allSubscribedData[vehicleID], self.timeStep)
         self.time += 1
 
     def collectAfterSimEnd(self, sim):
