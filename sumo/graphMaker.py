@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import subprocess
 
+import sumoTools
 import simulator as simu
 import trafficLightControllers.staticLights as staticLightCtrl
 import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
@@ -13,7 +14,7 @@ from simMeasurements import SimMeasurements
 
 
 def getCtrlsResults(mapPath, ctrls):
-    mapConfigFile = simu.createSimSumoConfigWithRandomTraffic(mapPath)
+    mapConfigFile = simu.createSimSumoConfigWithRandomTraffic(mapPath, additionalTrafficlighPhases=True)
 
     results = []
     for ctrl in ctrls:
@@ -183,29 +184,19 @@ def makeDensityComparisons(mapPath, ctrls, trafficThroughputMultipliers):
             yData[ctrlName].append(meanTravelTime)
             
     createBarChart(mapPath, xData, yData, 
-    data.getControllerName(),
     "Mean travel time, traffic density", 
     "Traffic density", "Mean travel time (steps)",
     "vehicle-density-mean-travel-time.pdf")
 
  
-def createBarChart(mapPath, xData, yData, name, title, xlabel, ylabel, fileName):
-    for x in xData:
-        print(f"x data value: {x}")
-
-    for ctrlName in yData:
-        mults = yData[ctrlName]
-        for i in range(len(mults)):
-            mult = xData[i]
-            meanTravel = mults[i]
-            print(f"Controller: {ctrlName}, mult: {mult}, mean travel: {meanTravel}")
+def createBarChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
 
     colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
 
     n_groups = len(xData)
 
     # create plot
-    fig, ax = plt.subplots()
+    plt.subplots()
     index = np.arange(n_groups)
     bar_width = 0.35
     opacity = 0.8
@@ -230,15 +221,45 @@ def createBarChart(mapPath, xData, yData, name, title, xlabel, ylabel, fileName)
     plt.savefig(os.path.join(mapGraphPath, fileName))
 
 
-def makeRandomMap(mapSavePath, mapName):
-    if not os.path.isdir(mapSavePath):
-        os.mkdir(mapSavePath)
-    mapFilepath = os.path.join(mapSavePath, mapName)
-    #netgenerate.py
-    #generateTLSE2Detectors.py
-    #tlsCycleAdaptation.py
-    #tlsCoordinator.py maybe?
+def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
+    # for every detector length, run the simulation and make some graphs
+    xData = tuple(detectorLengths)
+    yData = {}
+
+    results = {}
+    for length in detectorLengths:
+        print(f"Testing map: {mapPath} with lane detector length: {length}")
+        sumoTools.createLaneDetectors(mapFilepath, length)
+        results[length] = getCtrlsResults(mapPath, ctrls)
+
+    for length in results:
+        result = results[length]
+        for ctrlResult in result:
+            ctrlName = ctrlResult.getControllerName()
+            print(f"ctrl: {ctrlName}, length: {length}")
+            if ctrlName not in yData.keys():
+                yData[ctrlName] = []
+            meanTravelTime = ctrlResult.getAverageTravelTime()
+            yData[ctrlName].append(meanTravelTime)
+
+    createBarChart(mapPath, xData, yData,
+    "Mean travel time, lane detector length", 
+    "Lane detector length (m)", "Mean travel time (steps)",
+    "vehicle-lane-detector-length-mean-travel-time.pdf")
 
 
-makeComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
-makeDensityComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [0.05, 0.10, 0.15, 0.20, 0.25])
+mapSavePath = "random_map"
+if not os.path.isdir(mapSavePath):
+    os.mkdir(mapSavePath)
+mapFilepath = os.path.join(mapSavePath, "rng1" + ".net.xml")
+sumoTools.createRandomMap(mapFilepath)
+sumoTools.createLaneDetectors(mapFilepath)
+sumoTools.modifyTrafficLightPhases(mapFilepath)
+
+
+makeComparisonsDetectorLengths(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [5, 10, 20, 50, 100, 150, 200])
+
+
+#makeComparisons("random_map/rng1.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
+#makeComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
+#makeDensityComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [0.05, 0.10, 0.15, 0.20, 0.25])

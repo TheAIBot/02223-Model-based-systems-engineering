@@ -8,10 +8,9 @@ import sys
 import optparse
 import random
 import pathlib as Path
-
 import string
 
-import routeGen
+import sumoTools
 from simMeasurements import SimMeasurements
 
 random.seed(864)
@@ -26,11 +25,15 @@ else:
 from sumolib import checkBinary  # noqa
 import traci  # noqa
 
-def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.25):
-    routeFile = routeGen.generateRoutes(mapFilepath, 50, 10, trafficThroughputMultiplier)
-    return createSimSumoConfig(mapFilepath, routeFile)
+def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.25, additionalTrafficlighPhases = False):
+    routeFile = sumoTools.generateRoutes(mapFilepath, 50, 10, trafficThroughputMultiplier)
+    return createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = additionalTrafficlighPhases)
 
-def createSimSumoConfig(mapFilepath, routeFile):
+def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = False):
+    additionalFiles = ["lanedetector.xml"]
+    if additionalTrafficlighPhases:
+        additionalFiles.append("trafficlightPhases.xml")
+
     mapFolder = os.path.dirname(mapFilepath)
     mapName = Path.Path(mapFilepath).stem
     mapConfigFilepath = os.path.join(mapFolder, mapName + ".sumocfg")
@@ -39,7 +42,7 @@ def createSimSumoConfig(mapFilepath, routeFile):
         print("    <input>", file=mapConfig)
         print("        <net-file value=\"{}\"/>".format(os.path.basename(mapFilepath)), file=mapConfig)
         print("        <route-files value=\"{}\"/>".format(routeFile), file=mapConfig)
-        print("        <additional-files value=\"{}\"/>".format("lanedetector.xml"), file=mapConfig)
+        print("        <additional-files value=\"{}\"/>".format(str.join(", ", additionalFiles)), file=mapConfig)
         print("    </input>", file=mapConfig)
         print("</configuration>", file=mapConfig)
 
@@ -61,7 +64,7 @@ class SumoSim():
 
         ticks = 0
         while self.sumoCon.simulation.getMinExpectedNumber() > 0:
-            self.tlCtrl.updateLights(self.sumoCon, ticks)
+            self.tlCtrl.update(self.sumoCon, ticks)
 
             measurements.update(self.sumoCon)
 

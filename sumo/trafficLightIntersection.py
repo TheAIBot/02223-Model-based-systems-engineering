@@ -2,6 +2,18 @@
 
 from trafficLightGroup import TrafficLightGroup
 
+import os
+import sys
+
+# we need to import python modules from the $SUMO_HOME/tools directory
+if 'SUMO_HOME' in os.environ:
+    tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
+    sys.path.append(tools)
+else:
+    sys.exit("please declare environment variable 'SUMO_HOME'")
+
+import traci.constants as tc
+
 
 def getLinkGroups(tlID, program, sim):
     linkCount = len(program.phases[0].state)
@@ -27,21 +39,27 @@ def getLinkGroups(tlID, program, sim):
 def getLinkGroupLaneDetectors(tlID, linkGroups, sim):
     groupsLaneDetectors = []
     links = sim.trafficlight.getControlledLinks(tlID)
-    laneDetectorNames = sim.lanearea.getIDList()
-
-    laneDetectorNameIDs = []
-    for laneDName in laneDetectorNames:
-        laneDetectorNameIDs.append(sim.lanearea.getLaneID(laneDName))
+    laneDetectorNames = sim.multientryexit.getIDList()
+    trafficLightDetectors = dict()
+    for detectorName in laneDetectorNames:
+        dwa = detectorName.split("_")
+        detectortlID = dwa[1]
+        if detectortlID == tlID:
+            roadID = dwa[2]
+            if roadID not in trafficLightDetectors:
+                trafficLightDetectors[roadID] = []
+            trafficLightDetectors[roadID].append(detectorName)
 
     for group in linkGroups:
         groupLaneDetectors = []
         for gIdx in group:
             if len(links[gIdx]) > 0:
                 incommingLane = links[gIdx][0][0]
-                if incommingLane in laneDetectorNameIDs:
-                    laneDetectorName = laneDetectorNames[laneDetectorNameIDs.index(incommingLane)]
-                    if laneDetectorName not in groupLaneDetectors:
-                        groupLaneDetectors.append(laneDetectorName)
+                incommingRoad = incommingLane.split("_")[0]
+                if incommingRoad in trafficLightDetectors:
+                    for detector in trafficLightDetectors[incommingRoad]:
+                        if detector not in groupLaneDetectors:
+                            groupLaneDetectors.append(detector)
         groupsLaneDetectors.append(groupLaneDetectors)
 
     return groupsLaneDetectors
@@ -53,12 +71,18 @@ class TrafficLightIntersection():
         self.program = sim.trafficlight.getAllProgramLogics(self.tlID)[0]
         self.tlGroups = []
         self.targetGroup = None
+        self.currPhaseIdx = 0
 
         linkGroups, groupsPreferedPhase = getLinkGroups(self.tlID, self.program, sim)
         linkGroupsLaneDetectors = getLinkGroupLaneDetectors(self.tlID, linkGroups, sim)
 
         for i in range(len(linkGroups)):
             self.tlGroups.append(TrafficLightGroup(linkGroups[i], linkGroupsLaneDetectors[i], groupsPreferedPhase[i]))
+
+        for group in self.tlGroups:
+            group.subscribeLaneDetectors(sim)
+
+        sim.trafficlight.subscribe(self.tlID, (tc.TL_CURRENT_PHASE,))
 
     def findNextPhaseToTargetGroup(self, currPhaseIdx):
         """
@@ -80,23 +104,26 @@ class TrafficLightIntersection():
 
     def resetPhaseRemainingTime(self, phaseIdx, sim):
         phaseDuration = self.program.phases[phaseIdx].duration
-        sim.trafficlight.setPhaseDuration(self.tlID, phaseDuration)
+        sim.trafficlight.setPhaseDuration(self.tlID, phaseDuration)     
 
     def update(self, sim):
         if self.targetGroup is not None:
-            currPhaseIdx = sim.trafficlight.getPhase(self.tlID)
-
-            #if has reached the correct phase
-            if currPhaseIdx == self.targetGroup.greenPhaseIdx:
+            if self.currPhaseIdx == self.targetGroup.greenPhaseIdx:
                 self.targetGroup = None
                 return
 
-            nextPhaseIdx = self.findNextPhaseToTargetGroup(currPhaseIdx)
-            if currPhaseIdx != nextPhaseIdx:
-                sim.trafficlight.setPhase(self.tlID, nextPhaseIdx)
+            nextPhaseIdx = self.findNextPhaseToTargetGroup(self.currPhaseIdx)
+            if self.currPhaseIdx != nextPhaseIdx:
+                sim.trafficlight.setPhase(self.tlID, nextPhaseIdx)           
+
+    def updateWithDataFromSumo(self, detectorData, trafficlightData):
+        for group in self.tlGroups:
+            group.updateLaneDetectorValues(detectorData)
+
+        self.currPhaseIdx = trafficlightData[self.tlID][tc.TL_CURRENT_PHASE]
 
     def setGroupAsGreen(self, group, sim):
-        if sim.trafficlight.getPhase(self.tlID) == group.greenPhaseIdx:
+        if self.currPhaseIdx == group.greenPhaseIdx:
             self.resetPhaseRemainingTime(group.greenPhaseIdx, sim)
         else:
             self.targetGroup = group
@@ -107,3 +134,6 @@ class TrafficLightIntersection():
 
     def getTrafficLightGroups(self):
         return self.tlGroups
+
+    def getCurretPhaseIndex(self):
+        return self.currPhaseIdx
