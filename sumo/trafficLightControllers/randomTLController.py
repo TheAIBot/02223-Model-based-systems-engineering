@@ -1,24 +1,13 @@
 import random
-from trafficLightIntersection import TrafficLightIntersection
+from trafficLightController import TrafficLightController
 
-class ctrl():
+class ctrl(TrafficLightController):
 
-    def init(self, sim):
-        # get traffic light ids for this simulation
-        self.tLightIds = sim.trafficlight.getIDList()
-
-        self.tlIntersections = []
-        for tlID in self.tLightIds:
-            self.tlIntersections.append(TrafficLightIntersection(tlID, sim))
+    def __init__(self):
+        super().__init__("Random")
 
     def updateLights(self, sim, ticks):
         if ticks % 50 == 0:
             for tlIntersection in self.tlIntersections:
                 rngGroup = random.randint(0, len(tlIntersection.getTrafficLightGroups()) - 1)
                 tlIntersection.setGroupAsGreen(tlIntersection.getTrafficLightGroups()[rngGroup], sim)
-
-        for tlIntersection in self.tlIntersections:
-            tlIntersection.update(sim)
-
-    def getName(self):
-        return "Random"

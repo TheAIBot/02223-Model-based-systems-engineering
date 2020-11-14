@@ -1,16 +1,9 @@
-from trafficLightIntersection import TrafficLightIntersection
+from trafficLightController import TrafficLightController
 
-class ctrl():
+class ctrl(TrafficLightController):
 
-    def init(self, sim):
-        # get traffic light ids for this simulation
-        self.tLightIds = sim.trafficlight.getIDList()
-
-        self.tlIntersections = []
-        for tlID in self.tLightIds:
-            tl = TrafficLightIntersection(tlID, sim)
-            if len(tl.getTrafficLightGroups()) > 0:
-                self.tlIntersections.append(tl)
+    def __init__(self):
+        super().__init__("Largest queue first")
 
     def updateLights(self, sim, ticks):
         for tlIntersection in self.tlIntersections:
@@ -18,17 +11,11 @@ class ctrl():
             longestQueueGroup = None
             for group in tlIntersection.getTrafficLightGroups():
                 queueLength = 0
-                for laneDetectorID in group.getLaneDetectorIDs():
-                    queueLength = max(queueLength, sim.multientryexit.getLastStepVehicleNumber(laneDetectorID))
+                for laneDetectorValue in group.getLaneDetectorValues():
+                    queueLength = max(queueLength, laneDetectorValue)
                 
                 if queueLength > longestQueue or longestQueueGroup is None:
                     longestQueue = queueLength
                     longestQueueGroup = group
 
             tlIntersection.setGroupAsGreen(longestQueueGroup, sim)
-
-        for tlIntersection in self.tlIntersections:
-            tlIntersection.update(sim)
-
-    def getName(self):
-        return "Largest queue first"

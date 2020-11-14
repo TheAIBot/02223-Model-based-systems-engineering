@@ -62,7 +62,7 @@ class SumoSim():
 
         ticks = 0
         while self.sumoCon.simulation.getMinExpectedNumber() > 0:
-            self.tlCtrl.updateLights(self.sumoCon, ticks)
+            self.tlCtrl.update(self.sumoCon, ticks)
 
             measurements.update(self.sumoCon)
 

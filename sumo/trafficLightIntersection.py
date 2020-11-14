@@ -2,6 +2,18 @@
 
 from trafficLightGroup import TrafficLightGroup
 
+import os
+import sys
+
+# we need to import python modules from the $SUMO_HOME/tools directory
+if 'SUMO_HOME' in os.environ:
+    tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
+    sys.path.append(tools)
+else:
+    sys.exit("please declare environment variable 'SUMO_HOME'")
+
+import traci.constants as tc
+
 
 def getLinkGroups(tlID, program, sim):
     linkCount = len(program.phases[0].state)
@@ -59,6 +71,7 @@ class TrafficLightIntersection():
         self.program = sim.trafficlight.getAllProgramLogics(self.tlID)[0]
         self.tlGroups = []
         self.targetGroup = None
+        self.currPhaseIdx = 0
 
         linkGroups, groupsPreferedPhase = getLinkGroups(self.tlID, self.program, sim)
         linkGroupsLaneDetectors = getLinkGroupLaneDetectors(self.tlID, linkGroups, sim)
@@ -66,15 +79,18 @@ class TrafficLightIntersection():
         for i in range(len(linkGroups)):
             self.tlGroups.append(TrafficLightGroup(linkGroups[i], linkGroupsLaneDetectors[i], groupsPreferedPhase[i]))
 
+        for group in self.tlGroups:
+            group.subscribeLaneDetectors(sim)
+
+        sim.trafficlight.subscribe(self.tlID, (tc.TL_CURRENT_PHASE,))
+
     def update(self, sim):
         if self.targetGroup is not None:
-            currPhaseIdx = sim.trafficlight.getPhase(self.tlID)
-
-            if currPhaseIdx == self.targetGroup.greenPhaseIdx:
+            if self.currPhaseIdx == self.targetGroup.greenPhaseIdx:
                 self.targetGroup = None
                 return
 
-            nextPhaseIdx = currPhaseIdx
+            nextPhaseIdx = self.currPhaseIdx
             gotoNextPhase = True
             while gotoNextPhase:
                 gotoNextPhase = False
@@ -87,11 +103,17 @@ class TrafficLightIntersection():
                 if nextPhaseIdx == self.targetGroup.greenPhaseIdx:
                     break
 
-            if currPhaseIdx != nextPhaseIdx:
+            if self.currPhaseIdx != nextPhaseIdx:
                 sim.trafficlight.setPhase(self.tlID, nextPhaseIdx)
 
+    def updateWithDataFromSumo(self, detectorData, trafficlightData):
+        for group in self.tlGroups:
+            group.updateLaneDetectorValues(detectorData)
+
+        self.currPhaseIdx = trafficlightData[self.tlID][tc.TL_CURRENT_PHASE]
+
     def setGroupAsGreen(self, group, sim):
-        if sim.trafficlight.getPhase(self.tlID) == group.greenPhaseIdx:
+        if self.currPhaseIdx == group.greenPhaseIdx:
             phaseDuration = self.program.phases[group.greenPhaseIdx].duration
             sim.trafficlight.setPhaseDuration(self.tlID, phaseDuration)
         else:
@@ -99,3 +121,6 @@ class TrafficLightIntersection():
 
     def getTrafficLightGroups(self):
         return self.tlGroups
+
+    def getCurretPhaseIndex(self):
+        return self.currPhaseIdx
