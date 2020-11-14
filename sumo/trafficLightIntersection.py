@@ -78,6 +78,10 @@ class TrafficLightIntersection():
 
         return nextPhaseIdx
 
+    def resetPhaseRemainingTime(self, phaseIdx, sim):
+        phaseDuration = self.program.phases[phaseIdx].duration
+        sim.trafficlight.setPhaseDuration(self.tlID, phaseDuration)
+
     def update(self, sim):
         if self.targetGroup is not None:
             currPhaseIdx = sim.trafficlight.getPhase(self.tlID)
@@ -93,10 +97,13 @@ class TrafficLightIntersection():
 
     def setGroupAsGreen(self, group, sim):
         if sim.trafficlight.getPhase(self.tlID) == group.greenPhaseIdx:
-            phaseDuration = self.program.phases[group.greenPhaseIdx].duration
-            sim.trafficlight.setPhaseDuration(self.tlID, phaseDuration)
+            self.resetPhaseRemainingTime(group.greenPhaseIdx, sim)
         else:
             self.targetGroup = group
+
+    def setGroupsGreenPhaseLength(self, group, phaseLength, sim):
+        self.program.phases[group.greenPhaseIdx].duration = phaseLength
+        sim.trafficlight.setProgramLogic(self.tlID, self.program)
 
     def getTrafficLightGroups(self):
         return self.tlGroups
