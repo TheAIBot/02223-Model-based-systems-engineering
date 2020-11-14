@@ -241,4 +241,4 @@ def makeRandomMap(mapSavePath, mapName):
 
 
 makeComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
-makeDensityComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [0.05, 0.10, 0.20, 0.25])
+makeDensityComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [0.05, 0.10, 0.15, 0.20, 0.25])
