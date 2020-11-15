@@ -39,9 +39,8 @@ def getLinkGroups(tlID, program, sim):
 
     return groups, groupsPreferedPhase
 
-def getLinkGroupLaneDetectors(tlID, linkGroups, sim):
+def getLinkGroupLaneDetectors(tlID, linkGroups, links, sim):
     groupsLaneDetectors = []
-    links = sim.trafficlight.getControlledLinks(tlID)
     laneDetectorNames = sim.multientryexit.getIDList()
     trafficLightDetectors = dict()
     for detectorName in laneDetectorNames:
@@ -72,15 +71,16 @@ class TrafficLightIntersection():
     def __init__(self, tlID, sim):
         self.tlID = tlID
         self.program = sim.trafficlight.getAllProgramLogics(self.tlID)[0]
+        self.tlControlledLinks = sim.trafficlight.getControlledLinks(self.tlID)
         self.tlGroups = []
         self.targetGroup = None
         self.currPhaseIdx = 0
 
         linkGroups, groupsPreferedPhase = getLinkGroups(self.tlID, self.program, sim)
-        linkGroupsLaneDetectors = getLinkGroupLaneDetectors(self.tlID, linkGroups, sim)
+        linkGroupsLaneDetectors = getLinkGroupLaneDetectors(self.tlID, linkGroups, self.tlControlledLinks, sim)
 
         for i in range(len(linkGroups)):
-            self.tlGroups.append(TrafficLightGroup(linkGroups[i], linkGroupsLaneDetectors[i], groupsPreferedPhase[i]))
+            self.tlGroups.append(TrafficLightGroup(self, linkGroups[i], linkGroupsLaneDetectors[i], groupsPreferedPhase[i]))
 
         for group in self.tlGroups:
             group.subscribeLaneDetectors(sim)
@@ -140,3 +140,6 @@ class TrafficLightIntersection():
 
     def getCurretPhaseIndex(self):
         return self.currPhaseIdx
+
+    def getControlledLinks(self):
+        return self.tlControlledLinks

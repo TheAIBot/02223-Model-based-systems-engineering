@@ -13,7 +13,8 @@ else:
 import traci.constants as tc
 
 class TrafficLightGroup():
-    def __init__(self, linkIdxs, laneDetectorIDs, greenPhaseIdx):
+    def __init__(self, tlInter, linkIdxs, laneDetectorIDs, greenPhaseIdx):
+        self.tlInter = tlInter
         self.linkIDxs = linkIdxs
         self.laneDetectorIDs = laneDetectorIDs
         self.greenPhaseIdx = greenPhaseIdx
@@ -35,4 +36,23 @@ class TrafficLightGroup():
     def getLaneDetectorValues(self):
         return self.laneDetectorValues.values()
 
-    #def subscribeLaneDetectors
+    def getTLLinkIndexes(self):
+        return self.linkIDxs
+
+    def getincommingLaneIDs(self):
+        incommingLanes = []
+        links = self.tlInter.getControlledLinks()
+        for linkIdx in self.linkIDxs:
+            if len(links[linkIdx]) > 0:
+                incommingLanes.append(links[linkIdx][0][0])
+
+        return incommingLanes
+
+    def getoutgoingLaneIDs(self):
+        outgoingLanes = []
+        links = self.tlInter.getControlledLinks()
+        for linkIdx in self.linkIDxs:
+            if len(links[linkIdx]) > 0:
+                outgoingLanes.append(links[linkIdx][0][2])
+
+        return outgoingLanes
