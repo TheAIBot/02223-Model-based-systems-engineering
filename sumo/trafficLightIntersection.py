@@ -34,6 +34,9 @@ def getLinkGroups(tlID, program, sim):
             groups.append(group)
             groupsPreferedPhase.append(phaseIdx)
 
+    if False in linkUsed:
+        raise Exception("All links must be given a group.")
+
     return groups, groupsPreferedPhase
 
 def getLinkGroupLaneDetectors(tlID, linkGroups, sim):
