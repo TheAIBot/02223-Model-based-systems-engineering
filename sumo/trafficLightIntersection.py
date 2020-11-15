@@ -27,7 +27,7 @@ def getLinkGroups(tlID, program, sim):
     for phaseIdx, phase in enumerate(program.phases):
         group = []
         for i, tlState in enumerate(phase.state):
-            if tlState == "g" and not linkUsed[i]:
+            if tlState.lower() == "g" and not linkUsed[i]:
                 group.append(i)
                 linkUsed[i] = True
         if len(group) > 0:
@@ -95,7 +95,7 @@ class TrafficLightIntersection():
         skipping over other groups green phases.
         """
         nextPhaseIdx = currPhaseIdx
-        while "g" in self.program.phases[nextPhaseIdx].state:
+        while "g" in self.program.phases[nextPhaseIdx].state.lower():
             nextPhaseIdx = (nextPhaseIdx + 1) % len(self.program.phases)
             if nextPhaseIdx == self.targetGroup.greenPhaseIdx:
                 break
