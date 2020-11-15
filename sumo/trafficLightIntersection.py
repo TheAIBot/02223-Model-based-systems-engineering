@@ -20,49 +20,88 @@ def getLinkGroups(tlID, program, sim):
     groups = []
     groupsPreferedPhase = []
 
-    linkUsed = []
-    for i in range(linkCount):
-        linkUsed.append(False)
 
-    for phaseIdx, phase in enumerate(program.phases):
-        group = []
-        for i, tlState in enumerate(phase.state):
-            if tlState.lower() == "g" and not linkUsed[i]:
-                group.append(i)
-                linkUsed[i] = True
+    for _ in range(len(program.phases)):
+        groups.append([])
+
+    #each link should be part of a group.
+    #go through all phases and find a phase
+    #where the link is green. Links that are
+    #green in the same phase will be added to
+    #the same group.
+    for linkIdx in range(linkCount):
+        foundGreenPhase = False
+        #G has higher priority than g so
+        #a link should prefer being part of
+        #the group where it's in state G.
+        #Not all links have a G state and in
+        #those cases they will be part of the
+        #group where they are in their g state.
+        for phaseIdx in range(len(program.phases)):
+            if program.phases[phaseIdx].state[linkIdx] == "G":
+                foundGreenPhase = True
+                groups[phaseIdx].append(linkIdx)
+                break
+        if not foundGreenPhase:
+            for phaseIdx in range(len(program.phases)):
+                if program.phases[phaseIdx].state[linkIdx] == "g":
+                    foundGreenPhase = True
+                    groups[phaseIdx].append(linkIdx)
+                    break
+            if not foundGreenPhase:
+                raise Exception("All links must have a green phase")
+
+    linkGroups = []
+    for phaseIdx, group in enumerate(groups):
         if len(group) > 0:
-            groups.append(group)
+            linkGroups.append(group)
             groupsPreferedPhase.append(phaseIdx)
 
-    if False in linkUsed:
-        raise Exception("All links must be given a group.")
-
-    return groups, groupsPreferedPhase
+    return linkGroups, groupsPreferedPhase
 
 def getLinkGroupLaneDetectors(tlID, linkGroups, links, sim):
     groupsLaneDetectors = []
     laneDetectorNames = sim.multientryexit.getIDList()
     trafficLightDetectors = dict()
+
+    for _ in range(len(linkGroups)):
+        groupsLaneDetectors.append([])
+
+    #get the lanes that the detectors are placed on
     for detectorName in laneDetectorNames:
         dwa = detectorName.split("_")
         detectortlID = dwa[1]
         if detectortlID == tlID:
             roadID = dwa[2]
-            if roadID not in trafficLightDetectors:
-                trafficLightDetectors[roadID] = []
-            trafficLightDetectors[roadID].append(detectorName)
+            if roadID in trafficLightDetectors:
+                raise Exception("Honestly now sure if two detectors can be on the same road.")
+            trafficLightDetectors[roadID] = detectorName
 
-    for group in linkGroups:
-        groupLaneDetectors = []
-        for gIdx in group:
-            if len(links[gIdx]) > 0:
-                incommingLane = links[gIdx][0][0]
-                incommingRoad = incommingLane.split("_")[0]
-                if incommingRoad in trafficLightDetectors:
-                    for detector in trafficLightDetectors[incommingRoad]:
-                        if detector not in groupLaneDetectors:
-                            groupLaneDetectors.append(detector)
-        groupsLaneDetectors.append(groupLaneDetectors)
+    for roadID, detectorName in trafficLightDetectors.items():
+        #a detector can be used by multiple traffic light groups.
+        #This causes problem so a detector must only be part of
+        #one traffic light group. Each group is scored on how
+        #many of its links are part of the detector. The group
+        #with the highest score is awarded the detector.
+        groupScores = []
+        for linkGroup in linkGroups:
+            score = 0
+            for linkIdx in linkGroup:
+                if len(links[linkIdx]) > 0:
+                    incommingLaneID = links[linkIdx][0][0]
+                    incommingRoadID = incommingLaneID.split("_")[0]
+                    if incommingRoadID == roadID:
+                        score += 1
+            groupScores.append(score)
+
+        bestGroupIdx = -1
+        bestGroupScore = 0
+        for groupIdx, score in enumerate(groupScores):
+            if bestGroupIdx == -1 or score > bestGroupScore:
+                bestGroupIdx = groupIdx
+                bestGroupScore = score
+
+        groupsLaneDetectors[bestGroupIdx].append(detectorName)
 
     return groupsLaneDetectors
 
