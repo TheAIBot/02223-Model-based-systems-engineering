@@ -4,6 +4,7 @@ import os
 import subprocess
 import random as rng
 import xml.etree.ElementTree as xmlReader
+from multiprocessing import Pool, cpu_count
 
 def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier, seed = 56):
     rng.seed(seed)
@@ -50,9 +51,12 @@ def genRoutesFromTrips(mapFilepath, tripFiles):
     return routeFilepath
 
 def generateRoutes(mapFilepath, carsPerGen, genCount, throughputMultiplier):
-    tripFiles = []
+    tripData = []
     for i in range(genCount):
-        tripFiles.append(genRandomTrips(mapFilepath, i, carsPerGen, throughputMultiplier))
+        tripData.append((mapFilepath, i, carsPerGen, throughputMultiplier, rng.randint(0, 100000))) 
+
+    with Pool(cpu_count()) as mpPool:
+        tripFiles = mpPool.starmap(genRandomTrips, tripData)
     return os.path.basename(genRoutesFromTrips(mapFilepath, tripFiles))
 
 def createRandomMap(mapFilepath):
