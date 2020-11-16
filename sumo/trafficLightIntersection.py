@@ -114,6 +114,7 @@ class TrafficLightIntersection():
         self.tlGroups = []
         self.targetGroup = None
         self.currPhaseIdx = 0
+        self.justSwitchedPhase = False
 
         linkGroups, groupsPreferedPhase = getLinkGroups(self.tlID, self.program, sim)
         linkGroupsLaneDetectors = getLinkGroupLaneDetectors(self.tlID, linkGroups, self.tlControlledLinks, sim)
@@ -162,7 +163,9 @@ class TrafficLightIntersection():
         for group in self.tlGroups:
             group.updateLaneDetectorValues(detectorData)
 
-        self.currPhaseIdx = trafficlightData[self.tlID][tc.TL_CURRENT_PHASE]
+        newPhaseIdx = trafficlightData[self.tlID][tc.TL_CURRENT_PHASE]
+        self.justSwitchedPhase = newPhaseIdx != self.currPhaseIdx
+        self.currPhaseIdx = newPhaseIdx        
 
     def setGroupAsGreen(self, group, sim):
         if self.currPhaseIdx == group.greenPhaseIdx:
@@ -182,3 +185,6 @@ class TrafficLightIntersection():
 
     def getControlledLinks(self):
         return self.tlControlledLinks
+
+    def phaseJustSwitched(self):
+        return self.justSwitchedPhase

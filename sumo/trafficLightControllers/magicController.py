@@ -27,11 +27,32 @@ class WeightedConnection():
         self.timeToReach = timeToReach
         self.percent = percent
 
-    def setTLGroup(self, group):
-        self.tlGroup = group
+    def setTLGroupIdx(self, groupIdx):
+        self.tlGroupIdx = groupIdx
 
-    def getTLGroup(self):
-        return self.tlGroup
+    def getTLGroupIdx(self):
+        return self.tlGroupIdx
+
+class TimedWeight():
+    def __init__(self, timeBeforeAddWeight, weight):
+        self.timeBeforeAddWeight = timeBeforeAddWeight
+        self.weightDuration = 20
+        self.weight = weight
+
+    def update(self):
+        if self.timeBeforeAddWeight > 0:
+            self.timeBeforeAddWeight -= 1
+
+        self.weightDuration -= 1
+
+    def getWeight(self):
+        if self.timeBeforeAddWeight > 0:
+            return 0
+
+        return self.weight
+
+    def isValid(self):
+        return self.weightDuration
 
 def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
     nodesToCheck = deque()
@@ -66,9 +87,6 @@ def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
 
     return foundGoals
 
-
-            
-
 class ctrl(TrafficLightController):
 
     def __init__(self):
@@ -76,6 +94,13 @@ class ctrl(TrafficLightController):
 
     def init(self, sim):
         super().init(sim)
+
+        self.tlWeights = dict()
+        for tlInter in self.tlIntersections:
+            groupWeights = []
+            for _ in tlInter.getTrafficLightGroups():
+                groupWeights.append([])
+            self.tlWeights[tlInter.tlID] = groupWeights
 
         self.tlIDToTLInter = dict()
         for tlInter in self.tlIntersections:
@@ -111,30 +136,62 @@ class ctrl(TrafficLightController):
                                 hasConnection = True
                                 break
                         if not hasConnection:
-                            conGroup = None
-                            for endTLGroup in self.tlIDToTLInter[connection.reachedTLID].getTrafficLightGroups():
+                            conGroupIdx = None
+                            for groupIdx, endTLGroup in enumerate(self.tlIDToTLInter[connection.reachedTLID].getTrafficLightGroups()):
                                 if connection.laneID in endTLGroup.getincommingLaneIDs():
-                                    conGroup = endTLGroup
+                                    conGroupIdx = groupIdx
                                     break
-                            if conGroup is None:
+                            if conGroupIdx is None:
                                 raise Exception("Oh no!")
                             self.tlweightConnections[tlInter.tlID].append(connection)
-                            connection.setTLGroup(conGroup)
+                            connection.setTLGroupIdx(conGroupIdx)
                             
-
-
-
     def updateLights(self, sim, ticks):
         for tlIntersection in self.tlIntersections:
             longestQueue = 0
             longestQueueGroup = None
-            for group in tlIntersection.getTrafficLightGroups():
+            for groupIdx, group in enumerate(tlIntersection.getTrafficLightGroups()):
                 queueLength = 0
                 for laneDetectorValue in group.getLaneDetectorValues():
                     queueLength = max(queueLength, laneDetectorValue)
+
+                for weight in self.tlWeights[tlIntersection.tlID][groupIdx]:
+                    queueLength += weight.getWeight()
                 
                 if queueLength > longestQueue or longestQueueGroup is None:
                     longestQueue = queueLength
                     longestQueueGroup = group
 
             tlIntersection.setGroupAsGreen(longestQueueGroup, sim)
+
+        self.updateWeights(sim)
+    
+    def updateWeights(self, sim):
+        for tlInter in self.tlIntersections:
+            for groupIdx in range(len(tlInter.getTrafficLightGroups())):
+                for weightIdx in reversed(range(len(self.tlWeights[tlInter.tlID][groupIdx]))):
+                    weight = self.tlWeights[tlInter.tlID][groupIdx][weightIdx]
+                    if weight.isValid():
+                        weight.update()
+                    else:
+                        del self.tlWeights[tlInter.tlID][groupIdx][weightIdx]
+
+
+        #for each traffic light, if it just switched phase
+        #and if the phase is the green phase for a traffic
+        #light group, then that group will send weights
+        #to the traffic lights it's connected to.
+        for tlInter in self.tlIntersections:
+            if not tlInter.phaseJustSwitched():
+                continue
+
+            for group in tlInter.getTrafficLightGroups():
+                if group.greenPhaseIdx != tlInter.getCurretPhaseIndex():
+                    continue
+
+                weight = group.getSumLaneDetectorValues()
+                if weight == 0:
+                    continue
+
+                for connection in self.tlweightConnections[tlInter.tlID]:
+                    self.tlWeights[connection.reachedTLID].append(TimedWeight(int(connection.timeToReach), weight))

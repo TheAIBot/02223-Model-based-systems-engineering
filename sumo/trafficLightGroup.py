@@ -36,6 +36,13 @@ class TrafficLightGroup():
     def getLaneDetectorValues(self):
         return self.laneDetectorValues.values()
 
+    def getSumLaneDetectorValues(self):
+        detectorSum = 0
+        for value in self.laneDetectorValues.values():
+            detectorSum += value
+
+        return detectorSum
+
     def getTLLinkIndexes(self):
         return self.linkIDxs
 
