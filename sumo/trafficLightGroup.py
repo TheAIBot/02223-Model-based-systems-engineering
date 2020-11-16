@@ -46,6 +46,9 @@ class TrafficLightGroup():
     def getTLLinkIndexes(self):
         return self.linkIDxs
 
+    def getGreenPhaseIndex(self):
+        return self.greenPhaseIdx
+
     def getincommingLaneIDs(self):
         incommingLanes = []
         links = self.tlInter.getControlledLinks()
