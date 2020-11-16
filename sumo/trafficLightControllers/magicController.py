@@ -202,4 +202,4 @@ class ctrl(TrafficLightController):
                     continue
 
                 for connection in self.tlweightConnections[tlInter.tlID]:
-                    self.tlWeights[connection.reachedTLID].append(TimedWeight(int(connection.timeToReach), weight))
+                    self.tlWeights[connection.reachedTLID][connection.getTLGroupIdx()].append(TimedWeight(int(connection.timeToReach * 3), weight))
