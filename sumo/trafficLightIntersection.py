@@ -38,7 +38,7 @@ def getLinkGroups(tlID, program, sim):
         #those cases they will be part of the
         #group where they are in their g state.
         for phaseIdx in range(len(program.phases)):
-            if program.phases[phaseIdx].state[linkIdx] == "G":
+            if program.phases[phaseIdx].state[linkIdx].upper() == "G":
                 foundGreenPhase = True
                 groups[phaseIdx].append(linkIdx)
                 break
