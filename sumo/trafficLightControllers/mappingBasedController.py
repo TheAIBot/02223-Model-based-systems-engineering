@@ -2,8 +2,8 @@ from trafficLightController import TrafficLightController
 
 
 class ctrl(TrafficLightController):
-    intervals = [0, 10, 20, 30]
-    intervalsTime = [0, 60, 120, 180]
+    intervals = [0, 5, 10, 15, 20]
+    intervalsTime = [0, 40, 80, 120, 160]
 
     def __init__(self, config):
         super().__init__(f"Mapping based controller {config}")
