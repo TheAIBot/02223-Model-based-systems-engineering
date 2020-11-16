@@ -5,7 +5,8 @@ import subprocess
 import random as rng
 import xml.etree.ElementTree as xmlReader
 
-def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier):
+def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier, seed = 56):
+    rng.seed(seed)
     tripsStartTime = round(rng.uniform(0, 1000))
     throughputInc = 1.0 / throughputMultiplier
     tripsReleaseTime = rng.uniform(100 * throughputInc, 400 * throughputInc)
@@ -16,7 +17,7 @@ def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier):
     mapFolderPath = os.path.dirname(mapFilepath)
     tripFilepath = os.path.join(mapFolderPath, "trips" + str(routeIndex) + ".xml")
     randomTripsPath = os.path.join(os.environ["SUMO_HOME"], "tools", "randomTrips.py")
-    procRes = subprocess.run(["python", randomTripsPath, "-n", mapFilepath, "--begin=" + str(tripsStartTime), "--end=" + str(tripsEndTime), "--period=" + "{0:.1f}".format(arrivalRate), "--binomial=" + str(int(max(1, throughputMultiplier))), "--seed=" + "56", "--fringe-factor=50", "-o",  tripFilepath])
+    procRes = subprocess.run(["python", randomTripsPath, "-n", mapFilepath, "--begin=" + str(tripsStartTime), "--end=" + str(tripsEndTime), "--period=" + "{0:.1f}".format(arrivalRate), "--binomial=" + str(int(max(1, throughputMultiplier))), "--seed=" + str(seed), "--fringe-factor=50", "-o",  tripFilepath])
     if procRes.returncode != 0:
         raise Exception("Executing randomTrips.py failed.")
     
