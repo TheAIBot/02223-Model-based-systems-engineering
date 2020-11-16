@@ -42,6 +42,7 @@ class TimedWeight():
     def update(self):
         if self.timeBeforeAddWeight > 0:
             self.timeBeforeAddWeight -= 1
+            return
 
         self.weightDuration -= 1
 
