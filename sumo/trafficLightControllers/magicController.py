@@ -183,14 +183,21 @@ class ctrl(TrafficLightController):
         #light group, then that group will send weights
         #to the traffic lights it's connected to.
         for tlInter in self.tlIntersections:
-            if not tlInter.phaseJustSwitched():
-                continue
-
             for group in tlInter.getTrafficLightGroups():
-                if group.greenPhaseIdx != tlInter.getCurretPhaseIndex():
+                #only send updates from this group if this group has
+                #green light
+                if not tlInter.inGroupsGreenPhase(group):
+                    continue
+
+                #every 5 steps in green phase will send updates
+                #to other traffic lights
+                if tlInter.getTimeInCurrentPhase() % 5 != 0:
                     continue
 
                 weight = group.getSumLaneDetectorValues()
+                #no need to send update if weight is 0
+                #because it won't influence the other
+                #traffic lights
                 if weight == 0:
                     continue
 
