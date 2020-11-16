@@ -155,6 +155,7 @@ class TrafficLightIntersection():
         if self.targetGroup is not None:
             if self.currPhaseIdx == self.targetGroup.greenPhaseIdx:
                 self.targetGroup = None
+                self.isInPrevTargetGreenPhase = True
                 return
 
             nextPhaseIdx = self.findNextPhaseToTargetGroup(self.currPhaseIdx)
