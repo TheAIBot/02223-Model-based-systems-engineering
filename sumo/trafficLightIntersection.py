@@ -115,6 +115,8 @@ class TrafficLightIntersection():
         self.targetGroup = None
         self.currPhaseIdx = 0
         self.justSwitchedPhase = False
+        self.timeInPhase = 0
+        self.isInPrevTargetGreenPhase = False
 
         linkGroups, groupsPreferedPhase = getLinkGroups(self.tlID, self.program, sim)
         linkGroupsLaneDetectors = getLinkGroupLaneDetectors(self.tlID, linkGroups, self.tlControlledLinks, sim)
@@ -165,15 +167,23 @@ class TrafficLightIntersection():
 
         newPhaseIdx = trafficlightData[self.tlID][tc.TL_CURRENT_PHASE]
         self.justSwitchedPhase = newPhaseIdx != self.currPhaseIdx
-        self.currPhaseIdx = newPhaseIdx        
+        self.currPhaseIdx = newPhaseIdx      
 
-    def setGroupAsGreen(self, group, sim):
+        if self.justSwitchedPhase:
+            self.timeInPhase = 0
+        else:
+            self.timeInPhase += 1  
+
+        if self.justSwitchedPhase:
+            self.isInPrevTargetGreenPhase = False
+
+    def setGroupAsGreen(self, group: TrafficLightGroup, sim):
         if self.currPhaseIdx == group.greenPhaseIdx:
             self.resetPhaseRemainingTime(group.greenPhaseIdx, sim)
         else:
             self.targetGroup = group
 
-    def setGroupsGreenPhaseLength(self, group, phaseLength, sim):
+    def setGroupsGreenPhaseLength(self, group: TrafficLightGroup, phaseLength, sim):
         self.program.phases[group.greenPhaseIdx].duration = phaseLength
         sim.trafficlight.setProgramLogic(self.tlID, self.program)
 
@@ -188,3 +198,15 @@ class TrafficLightIntersection():
 
     def phaseJustSwitched(self):
         return self.justSwitchedPhase
+    
+    def getTimeInCurrentPhase(self):
+        return self.timeInPhase
+
+    def inGroupsGreenPhase(self, group: TrafficLightGroup):
+        return self.currPhaseIdx == group.getGreenPhaseIndex()
+
+    def hasTarget(self):
+        return self.targetGroup is not None
+
+    def isInPrevTargetPhase(self):
+        return self.isInPrevTargetGreenPhase
