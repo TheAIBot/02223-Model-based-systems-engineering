@@ -149,6 +149,9 @@ class ctrl(TrafficLightController):
                             
     def updateLights(self, sim, ticks):
         for tlInter in self.tlIntersections:
+            if tlInter.hasTarget():
+                continue
+
             longestQueue = 0
             longestQueueGroup = None
                 queueLength = 0
