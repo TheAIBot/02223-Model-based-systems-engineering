@@ -154,10 +154,10 @@ class ctrl(TrafficLightController):
 
             longestQueue = 0
             longestQueueGroup = None
-                queueLength = 0
-                for laneDetectorValue in group.getLaneDetectorValues():
-                    queueLength = max(queueLength, laneDetectorValue)
             for groupIdx, group in enumerate(tlInter.getTrafficLightGroups()):
+                if tlInter.inGroupsGreenPhase(group) and tlInter.getTimeInCurrentPhase() > 50:
+                    continue
+                queueLength = group.getSumLaneDetectorValues()
 
                 for weight in self.tlWeights[tlInter.tlID][groupIdx]:
                     queueLength += weight.getWeight()
