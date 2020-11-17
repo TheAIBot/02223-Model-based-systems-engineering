@@ -36,7 +36,7 @@ class WeightedConnection():
 class TimedWeight():
     def __init__(self, timeBeforeAddWeight, weight):
         self.timeBeforeAddWeight = timeBeforeAddWeight
-        self.weightDuration = 20
+        self.weightDuration = timeBeforeAddWeight * 1
         self.weight = weight
 
     def update(self):
