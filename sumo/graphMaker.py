@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import subprocess
+from multiprocessing import Pool, cpu_count
 
 import sumoTools
 import simulator as simu
@@ -13,15 +14,23 @@ import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFi
 from simMeasurements import SimMeasurements
 
 
+def getCtrlResult(mapConfigFile, ctrl):
+    return simu.SumoSim(mapConfigFile, ctrl).run()
+
 def getCtrlsResults(mapPath, ctrls):
     mapConfigFile = simu.createSimSumoConfigWithRandomTraffic(mapPath, additionalTrafficlighPhases=True)
 
-    results = []
+    simsData = []
     for ctrl in ctrls:
-        sSim = simu.SumoSim(mapConfigFile, ctrl)
-        results.append(sSim.run())
+        simsData.append((mapConfigFile, ctrl))
 
-    return results
+    with Pool(cpu_count()) as mpPool:
+        return mpPool.starmap(getCtrlResult, simsData)
+    #results = []
+    #for data in simsData:
+    #    results.append(getCtrlResult(data[0], data[1]))
+    
+    #return results
 
 
 def getCtrlsDensityResults(mapPath, ctrls, trafficThroughputMultipliers):
