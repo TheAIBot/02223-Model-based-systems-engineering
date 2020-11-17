@@ -148,22 +148,22 @@ class ctrl(TrafficLightController):
                             connection.setTLGroupIdx(conGroupIdx)
                             
     def updateLights(self, sim, ticks):
-        for tlIntersection in self.tlIntersections:
+        for tlInter in self.tlIntersections:
             longestQueue = 0
             longestQueueGroup = None
-            for groupIdx, group in enumerate(tlIntersection.getTrafficLightGroups()):
                 queueLength = 0
                 for laneDetectorValue in group.getLaneDetectorValues():
                     queueLength = max(queueLength, laneDetectorValue)
+            for groupIdx, group in enumerate(tlInter.getTrafficLightGroups()):
 
-                for weight in self.tlWeights[tlIntersection.tlID][groupIdx]:
+                for weight in self.tlWeights[tlInter.tlID][groupIdx]:
                     queueLength += weight.getWeight()
                 
                 if queueLength > longestQueue or longestQueueGroup is None:
                     longestQueue = queueLength
                     longestQueueGroup = group
 
-            tlIntersection.setGroupAsGreen(longestQueueGroup, sim)
+                tlInter.setGroupAsGreen(longestQueueGroup, sim)
 
         self.updateWeights(sim)
     
