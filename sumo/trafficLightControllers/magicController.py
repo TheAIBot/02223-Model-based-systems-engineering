@@ -166,6 +166,12 @@ class ctrl(TrafficLightController):
                     longestQueue = queueLength
                     longestQueueGroup = group
 
+            if longestQueueGroup is not None:
+                #allow the previous targetted group to have a green
+                #phase that lasts for atleast 10 steps
+                if tlInter.isInPrevTargetPhase() and tlInter.getTimeInCurrentPhase() < 10 and not tlInter.inGroupsGreenPhase(longestQueueGroup):
+                    continue
+
                 tlInter.setGroupAsGreen(longestQueueGroup, sim)
 
         self.updateWeights(sim)
