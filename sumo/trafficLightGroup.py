@@ -37,11 +37,12 @@ class TrafficLightGroup():
 
         self.lastStepNewVehiclesCount = 0
         previousStepVehicles = self.currentStepVehicles
-        self.currentStepVehicles = set(subscribedData[detectorID][tc.LAST_STEP_VEHICLE_ID_LIST])
+        self.currentStepVehicles = set()
         for detectorID in self.laneDetectorIDs:
-            for vehicleID in self.currentStepVehicles:
+            for vehicleID in subscribedData[detectorID][tc.LAST_STEP_VEHICLE_ID_LIST]:
                 if vehicleID not in previousStepVehicles:
                     self.lastStepNewVehiclesCount += 1
+                self.currentStepVehicles.add(vehicleID)
 
     def getLaneDetectorValues(self):
         return self.laneDetectorValues.values()
