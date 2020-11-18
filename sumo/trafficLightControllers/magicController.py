@@ -81,9 +81,6 @@ def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
             if childLaneID not in laneIDsFound:
                 laneIDsFound.add(childLaneID)
                 
-                childLaneLength = child[7]
-                childLaneSpeedlimit = sim.lane.getMaxSpeed(childLaneID)
-                childLaneDriveTime = childLaneLength / childLaneSpeedlimit
                 nodesToCheck.append(Node(node.searchDepth + 1, childLaneID, node.timeToReach + childLaneDriveTime, node.percent / len(children)))
 
     return foundGoals
