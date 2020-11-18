@@ -225,16 +225,16 @@ def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
     "vehicle-lane-detector-length-mean-travel-time.pdf")
 
 
-mapSavePath = "random_map"
-if not os.path.isdir(mapSavePath):
-    os.mkdir(mapSavePath)
-mapFilepath = os.path.join(mapSavePath, "rng1" + ".net.xml")
-sumoTools.createRandomMap(mapFilepath)
-sumoTools.createLaneDetectors(mapFilepath)
-sumoTools.modifyTrafficLightPhases(mapFilepath)
 if __name__ == '__main__':
 
-
+    mapSavePath = "random_map"
+    if not os.path.isdir(mapSavePath):
+        os.mkdir(mapSavePath)
+    mapFilepath = os.path.join(mapSavePath, "rng1" + ".net.xml")
+    sumoTools.createRandomMap(mapFilepath)
+    sumoTools.createLaneDetectors(mapFilepath)
+    sumoTools.modifyTrafficLightPhases(mapFilepath)
+    
     #makeComparisonsDetectorLengths(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [5, 10, 20, 50, 100, 150, 200])
 
 
