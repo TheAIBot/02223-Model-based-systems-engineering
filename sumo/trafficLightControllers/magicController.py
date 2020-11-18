@@ -25,7 +25,12 @@ class WeightedConnection():
         self.reachedTLID = reachedTLID
         self.laneID = laneID
         self.timeToReach = timeToReach
-        self.percent = percent
+        self.reliability = 0
+        self.reliabilities = deque()
+        self.reliabilitySum = 0
+        self.maxReliabilities = 20
+        for _ in range(self.maxReliabilities):
+            self.reliabilities.append(0)
 
     def setTLGroupIdx(self, groupIdx):
         self.tlGroupIdx = groupIdx
@@ -33,33 +38,65 @@ class WeightedConnection():
     def getTLGroupIdx(self):
         return self.tlGroupIdx
 
+    def updateReliability(self, newReliability):
+        if len(self.reliabilities) == self.maxReliabilities:
+            self.reliabilitySum -= self.reliabilities.popleft()
+        self.reliabilities.append(newReliability)
+
+        self.reliabilitySum += newReliability
+        self.reliability = self.reliabilitySum / self.maxReliabilities
+        #print(int(100 * self.reliability))
+
+    def getReliability(self):
+        return self.reliability
+
+
+
 class TimedWeight():
-    def __init__(self, timeBeforeAddWeight, weight):
-        self.timeBeforeAddWeight = timeBeforeAddWeight
-        self.weightDuration = timeBeforeAddWeight * 1
+    def __init__(self, weightCon: WeightedConnection, timeBeforeArrival, vehicleCount, weight):
+        self.weightCon = weightCon
+        self.expectedArrivalStart = timeBeforeArrival * 0.4
+        self.expectedArrivalEnd = timeBeforeArrival * 1.6
+        self.expectedArrivalTimer = 0
+
+        self.expectedVehicles = vehicleCount
+        self.newArrivedVehicles = 0
+
+        self.timeBeforeAddWeight = max(0, int(timeBeforeArrival) - 10)
+        self.weightDuration = 0
         self.weight = weight
 
     def update(self):
         if self.timeBeforeAddWeight > 0:
             self.timeBeforeAddWeight -= 1
-            return
+        else:
+            self.weightDuration -= 1
 
-        self.weightDuration -= 1
+        self.expectedArrivalTimer += 1
+        if self.expectedArrivalEnd <= self.expectedArrivalTimer:
+            arrivedRatio = min(1, self.newArrivedVehicles / self.expectedVehicles)
+            self.weightCon.updateReliability(arrivedRatio)
 
     def getWeight(self):
         if self.timeBeforeAddWeight > 0:
             return 0
-
-        return self.weight
+        else:
+            return self.weight
 
     def isValid(self):
-        return self.weightDuration > 0
+        return self.weightDuration > 0 or self.expectedArrivalEnd > self.expectedArrivalTimer
+
+    def isInArrivalWindow(self):
+        return self.expectedArrivalTimer > self.expectedArrivalStart and self.expectedArrivalTimer < self.expectedArrivalEnd
+
+    def addVehiclesArrived(self, newVehiclesCount):
+        self.newArrivedVehicles += newVehiclesCount
 
 def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
     nodesToCheck = deque()
     laneIDsFound = set()
     foundGoals = []
-    foundGoalLaneIDs = set()
+    foundGoalTLIDs = set()
 
     nodesToCheck.append(Node(0, startLaneID, 0, 1.0))
     laneIDsFound.add(startLaneID)
@@ -68,10 +105,10 @@ def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
         node: Node = nodesToCheck.popleft()
 
         if node.laneID in goalLaneIDs:
-            goalLaneID = goalLaneIDs[node.laneID]
-            if goalLaneID not in foundGoalLaneIDs:
-                foundGoalLaneIDs.add(goalLaneID)
-                foundGoals.append(WeightedConnection(goalLaneID, node.laneID, node.timeToReach, node.percent))
+            goalTLID = goalLaneIDs[node.laneID]
+            if goalTLID not in foundGoalTLIDs:
+                foundGoalTLIDs.add(goalTLID)
+                foundGoals.append(WeightedConnection(goalTLID, node.laneID, node.timeToReach, node.percent))
             continue
         
         #list[(string approachedLane, bool hasPrio, bool isOpen, bool hasFoe, string approachedInternal, string state, string direction, float length)]
@@ -81,6 +118,7 @@ def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
             if childLaneID not in laneIDsFound:
                 laneIDsFound.add(childLaneID)
                 
+                childLaneDriveTime = sim.lane.getTraveltime(node.laneID)
                 nodesToCheck.append(Node(node.searchDepth + 1, childLaneID, node.timeToReach + childLaneDriveTime, node.percent / len(children)))
 
     return foundGoals
@@ -175,10 +213,12 @@ class ctrl(TrafficLightController):
     
     def updateWeights(self, sim):
         for tlInter in self.tlIntersections:
-            for groupIdx in range(len(tlInter.getTrafficLightGroups())):
+            for groupIdx, group in enumerate(tlInter.getTrafficLightGroups()):
                 for weightIdx in reversed(range(len(self.tlWeights[tlInter.tlID][groupIdx]))):
                     weight = self.tlWeights[tlInter.tlID][groupIdx][weightIdx]
                     if weight.isValid():
+                        if weight.isInArrivalWindow():
+                            weight.addVehiclesArrived(group.getLastStepNewVehiclesCount())
                         weight.update()
                     else:
                         del self.tlWeights[tlInter.tlID][groupIdx][weightIdx]
@@ -208,4 +248,4 @@ class ctrl(TrafficLightController):
                     continue
 
                 for connection in self.tlweightConnections[tlInter.tlID]:
-                    self.tlWeights[connection.reachedTLID][connection.getTLGroupIdx()].append(TimedWeight(int(connection.timeToReach * 3), weight))
+                    self.tlWeights[connection.reachedTLID][connection.getTLGroupIdx()].append(TimedWeight(connection, connection.timeToReach + 3, weight, weight * connection.getReliability()))
