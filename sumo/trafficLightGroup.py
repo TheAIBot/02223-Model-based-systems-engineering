@@ -21,9 +21,11 @@ class TrafficLightGroup():
 
         self.currentStepDetectorVehicles = dict()
         self.detectorLastStepNewVehiclesCount = dict()
+        self.detectorLastStepLeftVehiclesCount = dict()
         for detectorID in self.laneDetectorIDs:
             self.currentStepDetectorVehicles[detectorID] = []
             self.detectorLastStepNewVehiclesCount[detectorID] = 0
+            self.detectorLastStepLeftVehiclesCount[detectorID] = 0
 
     def getLaneDetectorIDs(self):
         return self.laneDetectorIDs
@@ -37,12 +39,17 @@ class TrafficLightGroup():
         for detectorID in self.laneDetectorIDs:
             prevDetectorVehicles = self.currentStepDetectorVehicles[detectorID]
             self.currentStepDetectorVehicles[detectorID] = []
+
+            prevDetectorVehicleCount = len(prevDetectorVehicles)
             self.detectorLastStepNewVehiclesCount[detectorID] = 0
 
             for vehicleID in subscribedData[detectorID][tc.LAST_STEP_VEHICLE_ID_LIST]:
                 if vehicleID not in prevDetectorVehicles:
                     self.detectorLastStepNewVehiclesCount[detectorID] += 1
+                else:
+                    prevDetectorVehicleCount -= 1
                 self.currentStepDetectorVehicles[detectorID].append(vehicleID)
+                self.detectorLastStepLeftVehiclesCount[detectorID] = prevDetectorVehicleCount
 
     def getLaneDetectorValues(self):
         detectorValues = dict()
@@ -50,6 +57,9 @@ class TrafficLightGroup():
             detectorValues[detectorID] = len(self.currentStepDetectorVehicles[detectorID])
 
         return detectorValues
+
+    def getLaneDetectorValue(self, detectorID):
+        return len(self.currentStepDetectorVehicles[detectorID])
 
     def getSumLaneDetectorValues(self):
         detectorSum = 0
@@ -101,3 +111,6 @@ class TrafficLightGroup():
 
     def getDetectorLastStepNewVehiclesCount(self, detectorID):
         return self.detectorLastStepNewVehiclesCount[detectorID]
+
+    def getDetectorLastStepLeftVehiclesCount(self, detectorID):
+        return self.detectorLastStepLeftVehiclesCount[detectorID]
