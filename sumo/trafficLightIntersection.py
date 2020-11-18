@@ -14,6 +14,37 @@ else:
 
 import traci.constants as tc
 
+#Traffic light foes are traffic lights that should change to red.
+#This is a list over the allowed changes that leads to red.
+allowedFoeTLChange = dict()
+allowedFoeTLChange["G"] = ["g", "y"] 
+allowedFoeTLChange["g"] = ["y"] 
+allowedFoeTLChange["y"] = ["r"]
+
+def isFoeTLStateChangeAllowed(prevState, newState):
+    if prevState == newState:
+        return True
+
+    if prevState in allowedFoeTLChange:
+        return newState in allowedFoeTLChange[prevState]
+    else:
+        return False
+
+#Traffic light friends are traffic lights that should change to green.
+#This is a list over the allowed changes that leads to green.
+allowedFriendTLChange = dict()
+allowedFriendTLChange["u"] = ["g", "G"]
+allowedFriendTLChange["r"] = ["y", "g", "G"]
+allowedFriendTLChange["y"] = ["g", "G"]
+
+def isFriendTLStateChangeAllowed(prevState, newState):
+    if prevState == newState:
+        return True
+
+    if prevState in allowedFriendTLChange:
+        return newState in allowedFriendTLChange[prevState]
+    else:
+        return False
 
 def getLinkGroups(tlID, program, sim):
     linkCount = len(program.phases[0].state)
@@ -114,6 +145,7 @@ class TrafficLightIntersection():
         self.tlGroups = []
         self.targetGroup = None
         self.currPhaseIdx = 0
+        self.prevPhaseIdx = 0
         self.justSwitchedPhase = False
         self.timeInPhase = 0
         self.isInPrevTargetGreenPhase = False
@@ -129,7 +161,7 @@ class TrafficLightIntersection():
 
         sim.trafficlight.subscribe(self.tlID, (tc.TL_CURRENT_PHASE,))
 
-    def findNextPhaseToTargetGroup(self, currPhaseIdx):
+    def findNextPhaseToTargetGroup(self, targetGroup: TrafficLightGroup, prevStateIdx: int, currPhaseIdx: int):
         """
         The trafficlight must go through its yellow -> red -> yellow
         phases before it can go to its green phase. It does this by
@@ -139,13 +171,49 @@ class TrafficLightIntersection():
         returns the index of the next phase it should switch to while
         skipping over other groups green phases.
         """
+
+        #Instead of sumo switching phases, this will pretend that it switch
+        #one step too early. By doing this, the traffic light won't spend 1 step
+        #in a phase it shouldn't be, before it's changed to the next good phase.
+        if self.program.phases[currPhaseIdx].duration - 1 == self.timeInPhase and self.getNextPhaseIdx(currPhaseIdx) != targetGroup.getGreenPhaseIndex():
+            currPhaseIdx = self.getNextPhaseIdx(currPhaseIdx)
+
+        targetGroupLinks = targetGroup.getTLLinkIndexes()
+        prevPhaseStates = self.program.phases[prevStateIdx].state
         nextPhaseIdx = currPhaseIdx
-        while "g" in self.program.phases[nextPhaseIdx].state.lower():
-            nextPhaseIdx = (nextPhaseIdx + 1) % len(self.program.phases)
-            if nextPhaseIdx == self.targetGroup.greenPhaseIdx:
+        while True:
+            goodPhase = True
+
+            #If the traffic light is currently in another groups green phase
+            #then this will detect it and switch to the next phase.
+            for group in self.tlGroups:
+                if nextPhaseIdx == group.getGreenPhaseIndex() and group != targetGroup:
+                    goodPhase = False
+                    break
+
+            if goodPhase:
+                #All phases that leads up to green phases for other groups are ignored.
+                for linkIdx, tlState in enumerate(self.program.phases[nextPhaseIdx].state):
+                    if linkIdx in targetGroupLinks:
+                        if not isFriendTLStateChangeAllowed(prevPhaseStates[linkIdx], tlState):
+                            goodPhase = False
+                            break
+                    else:
+                        if not isFoeTLStateChangeAllowed(prevPhaseStates[linkIdx], tlState):
+                            goodPhase = False
+                            break
+
+            if goodPhase:
+                break
+
+            nextPhaseIdx = self.getNextPhaseIdx(nextPhaseIdx)
+            if nextPhaseIdx == targetGroup.getGreenPhaseIndex():
                 break
 
         return nextPhaseIdx
+
+    def getNextPhaseIdx(self, phaseIdx):
+        return (phaseIdx + 1) % len(self.program.phases)
 
     def resetPhaseRemainingTime(self, phaseIdx, sim):
         phaseDuration = self.program.phases[phaseIdx].duration
@@ -158,17 +226,17 @@ class TrafficLightIntersection():
                 self.isInPrevTargetGreenPhase = True
                 return
 
-            nextPhaseIdx = self.findNextPhaseToTargetGroup(self.currPhaseIdx)
+            nextPhaseIdx = self.findNextPhaseToTargetGroup(self.targetGroup, self.prevPhaseIdx, self.currPhaseIdx)
             if self.currPhaseIdx != nextPhaseIdx:
-                sim.trafficlight.setPhase(self.tlID, nextPhaseIdx)           
+                sim.trafficlight.setPhase(self.tlID, nextPhaseIdx)
 
     def updateWithDataFromSumo(self, detectorData, trafficlightData):
         for group in self.tlGroups:
             group.updateLaneDetectorValues(detectorData)
 
-        newPhaseIdx = trafficlightData[self.tlID][tc.TL_CURRENT_PHASE]
-        self.justSwitchedPhase = newPhaseIdx != self.currPhaseIdx
-        self.currPhaseIdx = newPhaseIdx      
+        self.prevPhaseIdx = self.currPhaseIdx
+        self.currPhaseIdx = trafficlightData[self.tlID][tc.TL_CURRENT_PHASE]
+        self.justSwitchedPhase = self.prevPhaseIdx != self.currPhaseIdx   
 
         if self.justSwitchedPhase:
             self.timeInPhase = 0
@@ -179,7 +247,7 @@ class TrafficLightIntersection():
             self.isInPrevTargetGreenPhase = False
 
     def setGroupAsGreen(self, group: TrafficLightGroup, sim):
-        if self.currPhaseIdx == group.greenPhaseIdx:
+        if self.inGroupsGreenPhase(group):
             self.resetPhaseRemainingTime(group.greenPhaseIdx, sim)
         else:
             self.targetGroup = group
