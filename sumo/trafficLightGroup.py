@@ -80,3 +80,6 @@ class TrafficLightGroup():
 
     def getLastStepNewVehiclesCount(self):
         return self.lastStepNewVehiclesCount
+
+    def getVehicleIDsFromDetectors(self):
+        return self.currentStepVehicles
