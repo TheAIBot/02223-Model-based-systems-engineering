@@ -18,6 +18,8 @@ class TrafficLightGroup():
         self.linkIDxs = linkIdxs
         self.laneDetectorIDs = laneDetectorIDs
         self.greenPhaseIdx = greenPhaseIdx
+        self.currentStepVehicles = set()
+        self.lastStepNewVehiclesCount = 0
         self.laneDetectorValues = dict()
         for detectorID in range(len(self.laneDetectorIDs)):
             self.laneDetectorValues[detectorID] = 0
@@ -27,11 +29,19 @@ class TrafficLightGroup():
 
     def subscribeLaneDetectors(self, sim):
         for detectorID in self.laneDetectorIDs:
-            sim.multientryexit.subscribe(detectorID, (tc.LAST_STEP_VEHICLE_NUMBER,))
+            sim.multientryexit.subscribe(detectorID, (tc.LAST_STEP_VEHICLE_NUMBER, tc.LAST_STEP_VEHICLE_ID_LIST))
 
     def updateLaneDetectorValues(self, subscribedData):
         for detectorID in self.laneDetectorIDs:
             self.laneDetectorValues[detectorID] = subscribedData[detectorID][tc.LAST_STEP_VEHICLE_NUMBER]
+
+        self.lastStepNewVehiclesCount = 0
+        previousStepVehicles = self.currentStepVehicles
+        self.currentStepVehicles = set(subscribedData[detectorID][tc.LAST_STEP_VEHICLE_ID_LIST])
+        for detectorID in self.laneDetectorIDs:
+            for vehicleID in self.currentStepVehicles:
+                if vehicleID not in previousStepVehicles:
+                    self.lastStepNewVehiclesCount += 1
 
     def getLaneDetectorValues(self):
         return self.laneDetectorValues.values()
@@ -66,3 +76,6 @@ class TrafficLightGroup():
                 outgoingLanes.append(links[linkIdx][0][2])
 
         return outgoingLanes
+
+    def getLastStepNewVehicles(self):
+        return self.lastStepNewVehiclesCount
