@@ -11,6 +11,7 @@ import simulator as simu
 import trafficLightControllers.staticLights as staticLightCtrl
 import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
 import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
+import trafficLightControllers.magicController as magicCtrl
 from simMeasurements import SimMeasurements
 
 
