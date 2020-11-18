@@ -92,7 +92,7 @@ class TimedWeight():
     def addVehiclesArrived(self, newVehiclesCount):
         self.newArrivedVehicles += newVehiclesCount
 
-def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
+def bfs(sim, startLaneID, goalLaneIDs):
     nodesToCheck = deque()
     laneIDsFound = set()
     foundGoals = []
