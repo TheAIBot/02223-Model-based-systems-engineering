@@ -77,5 +77,5 @@ class TrafficLightGroup():
 
         return outgoingLanes
 
-    def getLastStepNewVehicles(self):
+    def getLastStepNewVehiclesCount(self):
         return self.lastStepNewVehiclesCount
