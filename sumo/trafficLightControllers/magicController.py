@@ -55,7 +55,7 @@ class TimedWeight():
     def isValid(self):
         return self.weightDuration > 0
 
-def bfs(sim, startLaneID, goalLaneIDs) -> list[WeightedConnection]:
+def bfs(sim, startLaneID, goalLaneIDs):
     nodesToCheck = deque()
     laneIDsFound = set()
     foundGoals = []
