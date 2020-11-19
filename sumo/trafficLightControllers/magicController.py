@@ -28,7 +28,7 @@ class WeightedConnection():
         self.timeToReach = timeToReach
         self.reliabilities = deque()
         self.reliabilitySum = 0
-        self.maxReliabilities = 1000
+        self.maxReliabilities = 10000
 
     def setTLGroupIdx(self, groupIdx):
         self.tlGroupIdx = groupIdx
