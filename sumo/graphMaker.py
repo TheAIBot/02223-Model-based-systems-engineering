@@ -33,6 +33,7 @@ def getCtrlsResults(mapPath, ctrls):
     
     #return results
 
+
 def getCtrlsDensityResults(mapPath, ctrls, trafficThroughputMultipliers):
     results = []
     mapConfigs = {}
@@ -52,6 +53,7 @@ def getCtrlsDensityResults(mapPath, ctrls, trafficThroughputMultipliers):
 
     return results
 
+
 def getGraphSavePath(mapPath):
     mapName = os.path.basename(os.path.dirname(mapPath))
     mapGraphPath = os.path.join("graphs", mapName)
@@ -63,6 +65,7 @@ def getGraphSavePath(mapPath):
         os.mkdir(mapGraphPath)
 
     return mapGraphPath
+
 
 def createHistogram(mapPath, data, dens, name, title, xlabel, ylabel, fileName):
     plt.hist(data, density = dens, bins = 30, label = name)
@@ -76,6 +79,7 @@ def createHistogram(mapPath, data, dens, name, title, xlabel, ylabel, fileName):
     plt.savefig(os.path.join(mapGraphPath, fileName))
     plt.clf()
 
+
 def getVehicleHistogramData(results, dataSelector):
     histData = []
     histNames = []
@@ -87,6 +91,7 @@ def getVehicleHistogramData(results, dataSelector):
         histNames.append(result.getControllerName())
 
     return histData, histNames
+
 
 def makeComparisons(mapPath, ctrls):
     results = getCtrlsResults(mapPath, ctrls)
@@ -147,6 +152,7 @@ def makeComparisons(mapPath, ctrls):
         "Time (steps)", "Fuel (ml)",
             "vehicle-fuel-emissions.pdf")
 
+
 def makeDensityComparisons(mapPath, ctrls, trafficThroughputMultipliers):
     results = getCtrlsDensityResults(mapPath, ctrls, trafficThroughputMultipliers)
     xData = tuple(trafficThroughputMultipliers)
@@ -167,6 +173,7 @@ def makeDensityComparisons(mapPath, ctrls, trafficThroughputMultipliers):
     "Traffic density", "Mean travel time (steps)",
     "vehicle-density-mean-travel-time.pdf")
 
+
 def createBarChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
 
     colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
@@ -176,7 +183,7 @@ def createBarChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
     # create plot
     plt.subplots()
     index = np.arange(n_groups)
-    bar_width = 0.35
+    bar_width = 0.20
     opacity = 0.8
 
     ctrlIndex = 0
@@ -197,6 +204,7 @@ def createBarChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
 
     mapGraphPath = getGraphSavePath(mapPath)
     plt.savefig(os.path.join(mapGraphPath, fileName))
+
 
 def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
     # for every detector length, run the simulation and make some graphs
@@ -225,8 +233,61 @@ def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
     "vehicle-lane-detector-length-mean-travel-time.pdf")
 
 
-if __name__ == '__main__':
+def chunks(lst, n):
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
+
+def makeComparisonsSmoothTravelTime(mapPath, ctrls, vehicleInterval):
+    results = getCtrlsResults(mapPath, ctrls)
+
+    sortedData = {}
+
+    for result in results:
+        name = result.getControllerName()
+        sortedData[name] = []
+        for vechData in result.vehiclesData.values():
+            sortedData[name].append(vechData)
+
+    for ctrl in sortedData:
+        sortedData[ctrl].sort(key=lambda x: x.routeStarted)
+
+    xData = []
+    yData = {}
+
+    firstIteration = True
+
+    for ctrl in sortedData:
+        data = sortedData[ctrl]
+        yData[ctrl] = []
+        for i in range(0, len(data)):
+            travelTimeSum = 0
+            vecAmount = 0
+            for j in range(i - vehicleInterval, i + vehicleInterval):
+                if (j >= 0 and j < len(data)):
+                    travelTimeSum += data[j].getTravelTime()
+                    vecAmount += 1
+            meanTravelTime = travelTimeSum / vecAmount
+            if firstIteration:
+                xData.append(data[i].routeStarted)
+            yData[ctrl].append(meanTravelTime)
+        firstIteration = False
+
+    print(f"xData start time length: {len(xData)}")
+
+    for ctrl in yData:
+        data = yData[ctrl]
+        print(f"ctrl: {ctrl} has {len(data)} elements")
+    
+    createBarChart(mapPath, tuple(xData), yData,
+    "Mean travel time (over time)",
+    "Time (steps)", "Mean travel time (steps)",
+    "vehicle-smoothed-travel-time.pdf")
+
+ 
+
+
+if __name__ == '__main__':
     mapSavePath = "random_map"
     if not os.path.isdir(mapSavePath):
         os.mkdir(mapSavePath)
@@ -234,10 +295,10 @@ if __name__ == '__main__':
     sumoTools.createRandomMap(mapFilepath)
     sumoTools.createLaneDetectors(mapFilepath)
     sumoTools.modifyTrafficLightPhases(mapFilepath)
+
+    makeComparisonsSmoothTravelTime(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], 25)
     
     #makeComparisonsDetectorLengths(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [5, 10, 20, 50, 100, 150, 200])
-
-
-    makeComparisons("random_map/rng1.net.xml", [largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()])
+    #makeComparisons("random_map/rng1.net.xml", [largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()])
     #makeComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
     #makeDensityComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], [1, 2, 3, 4, 5])
