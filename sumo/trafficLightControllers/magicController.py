@@ -26,7 +26,6 @@ class WeightedConnection():
         self.reachedTLID = reachedTLID
         self.laneID = laneID
         self.timeToReach = timeToReach
-        self.reliability = 0.5
         self.reliabilities = deque()
         self.reliabilitySum = 0
         self.maxReliabilities = 100
@@ -46,10 +45,12 @@ class WeightedConnection():
         self.reliabilities.append(newReliability)
 
         self.reliabilitySum += newReliability
-        self.reliability = self.reliabilitySum / self.maxReliabilities
 
     def getReliability(self):
-        return self.reliability
+        if len(self.reliabilities) == 0:
+            return 0
+        else:
+            return self.reliabilitySum / len(self.reliabilities)
 
     def setStartDetectorID(self, detectorID):
         self.startDetectorID = detectorID
