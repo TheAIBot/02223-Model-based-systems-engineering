@@ -80,9 +80,10 @@ class TimedWeight():
             self.weightDuration -= 1
 
         self.expectedArrivalTimer += 1
-        if self.expectedArrivalEnd <= self.expectedArrivalTimer:
-            arrivedRatio = min(1, self.newArrivedVehicles / self.expectedVehicles)
-            self.weightCon.updateReliability(arrivedRatio)
+
+    def updateReliability(self):
+        arrivedRatio = min(1, self.newArrivedVehicles / self.expectedVehicles)
+        self.weightCon.updateReliability(arrivedRatio)
 
     def getWeight(self):
         if self.timeBeforeAddWeight > 0:
@@ -246,6 +247,7 @@ class ctrl(TrafficLightController):
                                 weight.addVehiclesArrived(group.getDetectorLastStepNewVehiclesCount(weight.weightCon.getEndDetectorID()))
                             weight.update()
                         else:
+                                weight.updateReliability()
                             del self.detectorWeights[detectorID][weightIdx]
 
 
