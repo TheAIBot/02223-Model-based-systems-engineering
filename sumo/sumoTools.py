@@ -4,8 +4,10 @@ import os
 import subprocess
 import random as rng
 import xml.etree.ElementTree as xmlReader
+from multiprocessing import Pool, cpu_count
 
-def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier):
+def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier, seed = 56):
+    rng.seed(seed)
     tripsStartTime = round(rng.uniform(0, 1000))
     throughputInc = 1.0 / throughputMultiplier
     tripsReleaseTime = rng.uniform(100 * throughputInc, 400 * throughputInc)
@@ -16,7 +18,7 @@ def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier):
     mapFolderPath = os.path.dirname(mapFilepath)
     tripFilepath = os.path.join(mapFolderPath, "trips" + str(routeIndex) + ".xml")
     randomTripsPath = os.path.join(os.environ["SUMO_HOME"], "tools", "randomTrips.py")
-    procRes = subprocess.run(["python", randomTripsPath, "-n", mapFilepath, "--begin=" + str(tripsStartTime), "--end=" + str(tripsEndTime), "--period=" + "{0:.1f}".format(arrivalRate), "--binomial=" + str(int(max(1, throughputMultiplier))), "--seed=" + "56", "--fringe-factor=50", "-o",  tripFilepath])
+    procRes = subprocess.run(["python", randomTripsPath, "-n", mapFilepath, "--begin=" + str(tripsStartTime), "--end=" + str(tripsEndTime), "--period=" + "{0:.1f}".format(arrivalRate), "--binomial=" + str(int(max(1, throughputMultiplier))), "--seed=" + str(seed), "--fringe-factor=50", "-o",  tripFilepath])
     if procRes.returncode != 0:
         raise Exception("Executing randomTrips.py failed.")
     
@@ -49,9 +51,12 @@ def genRoutesFromTrips(mapFilepath, tripFiles):
     return routeFilepath
 
 def generateRoutes(mapFilepath, carsPerGen, genCount, throughputMultiplier):
-    tripFiles = []
+    tripData = []
     for i in range(genCount):
-        tripFiles.append(genRandomTrips(mapFilepath, i, carsPerGen, throughputMultiplier))
+        tripData.append((mapFilepath, i, carsPerGen, throughputMultiplier, rng.randint(0, 100000))) 
+
+    with Pool(cpu_count()) as mpPool:
+        tripFiles = mpPool.starmap(genRandomTrips, tripData)
     return os.path.basename(genRoutesFromTrips(mapFilepath, tripFiles))
 
 def createRandomMap(mapFilepath):

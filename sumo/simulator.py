@@ -32,6 +32,7 @@ def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplie
 def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = False):
     additionalFiles = ["lanedetector.xml"]
     if additionalTrafficlighPhases:
+        sumoTools.modifyTrafficLightPhases(mapFilepath)
         additionalFiles.append("trafficlightPhases.xml")
 
     mapFolder = os.path.dirname(mapFilepath)
@@ -54,19 +55,20 @@ class SumoSim():
         self.tlCtrl = trafficLightController
         self.label = str(self.tlCtrl) + ''.join(random.choice(string.ascii_lowercase) for i in range(20))
 
-        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000"], label = self.label)
+        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000", "--no-warnings", "true"], label = self.label)
         self.sumoCon = traci.getConnection(self.label)
 
         trafficLightController.init(self.sumoCon)
 
-    def run(self):
+    def run(self, takeMeasurements = True):
         measurements = SimMeasurements(1, self.tlCtrl)
 
         ticks = 0
         while self.sumoCon.simulation.getMinExpectedNumber() > 0:
             self.tlCtrl.update(self.sumoCon, ticks)
 
-            measurements.update(self.sumoCon)
+            if takeMeasurements:
+                measurements.update(self.sumoCon)
 
             self.sumoCon.simulationStep()
             ticks += 1

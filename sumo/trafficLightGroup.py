@@ -13,26 +13,104 @@ else:
 import traci.constants as tc
 
 class TrafficLightGroup():
-    def __init__(self, linkIdxs, laneDetectorIDs, greenPhaseIdx):
+    def __init__(self, tlInter, linkIdxs, laneDetectorIDs, greenPhaseIdx):
+        self.tlInter = tlInter
         self.linkIDxs = linkIdxs
         self.laneDetectorIDs = laneDetectorIDs
         self.greenPhaseIdx = greenPhaseIdx
-        self.laneDetectorValues = dict()
-        for detectorID in range(len(self.laneDetectorIDs)):
-            self.laneDetectorValues[detectorID] = 0
+
+        self.currentStepDetectorVehicles = dict()
+        self.detectorLastStepNewVehiclesCount = dict()
+        self.detectorLastStepLeftVehiclesCount = dict()
+        for detectorID in self.laneDetectorIDs:
+            self.currentStepDetectorVehicles[detectorID] = []
+            self.detectorLastStepNewVehiclesCount[detectorID] = 0
+            self.detectorLastStepLeftVehiclesCount[detectorID] = 0
 
     def getLaneDetectorIDs(self):
         return self.laneDetectorIDs
 
     def subscribeLaneDetectors(self, sim):
         for detectorID in self.laneDetectorIDs:
-            sim.multientryexit.subscribe(detectorID, (tc.LAST_STEP_VEHICLE_NUMBER,))
+            sim.multientryexit.subscribe(detectorID, (tc.LAST_STEP_VEHICLE_ID_LIST,))
 
     def updateLaneDetectorValues(self, subscribedData):
+        self.lastStepNewVehiclesCount = 0
         for detectorID in self.laneDetectorIDs:
-            self.laneDetectorValues[detectorID] = subscribedData[detectorID][tc.LAST_STEP_VEHICLE_NUMBER]
+            prevDetectorVehicles = self.currentStepDetectorVehicles[detectorID]
+            self.currentStepDetectorVehicles[detectorID] = []
+
+            prevDetectorVehicleCount = len(prevDetectorVehicles)
+            self.detectorLastStepNewVehiclesCount[detectorID] = 0
+
+            for vehicleID in subscribedData[detectorID][tc.LAST_STEP_VEHICLE_ID_LIST]:
+                if vehicleID not in prevDetectorVehicles:
+                    self.detectorLastStepNewVehiclesCount[detectorID] += 1
+                else:
+                    prevDetectorVehicleCount -= 1
+                self.currentStepDetectorVehicles[detectorID].append(vehicleID)
+                self.detectorLastStepLeftVehiclesCount[detectorID] = prevDetectorVehicleCount
 
     def getLaneDetectorValues(self):
-        return self.laneDetectorValues.values()
+        detectorValues = dict()
+        for detectorID in self.laneDetectorIDs:
+            detectorValues[detectorID] = len(self.currentStepDetectorVehicles[detectorID])
 
-    #def subscribeLaneDetectors
+        return detectorValues
+
+    def getLaneDetectorValue(self, detectorID):
+        return len(self.currentStepDetectorVehicles[detectorID])
+
+    def getSumLaneDetectorValues(self):
+        detectorSum = 0
+        for detectorID in self.laneDetectorIDs:
+            detectorSum += len(self.currentStepDetectorVehicles[detectorID])
+
+        return detectorSum
+
+    def getTLLinkIndexes(self):
+        return self.linkIDxs
+
+    def getGreenPhaseIndex(self):
+        return self.greenPhaseIdx
+
+    def getincommingLaneIDs(self):
+        incommingLanes = []
+        links = self.tlInter.getControlledLinks()
+        for linkIdx in self.linkIDxs:
+            if len(links[linkIdx]) > 0:
+                incommingLanes.append(links[linkIdx][0][0])
+
+        return incommingLanes
+
+    def getoutgoingLaneIDs(self):
+        outgoingLanes = []
+        links = self.tlInter.getControlledLinks()
+        for linkIdx in self.linkIDxs:
+            if len(links[linkIdx]) > 0:
+                outgoingLanes.append(links[linkIdx][0][2])
+
+        return outgoingLanes
+
+    def getLastStepNewVehiclesCount(self):
+        newVehicles = 0
+        for detectorID in self.laneDetectorIDs:
+            newVehicles += self.detectorLastStepNewVehiclesCount[detectorID]
+
+        return newVehicles
+
+    def getVehicleIDsFromDetectors(self):
+        detectorVehicles = []
+        for detectorID in self.laneDetectorIDs:
+            detectorVehicles.extend(self.currentStepDetectorVehicles[detectorID])
+
+        return detectorVehicles
+
+    def getDetectorVehicleIDs(self, detectorID):
+        return self.currentStepDetectorVehicles[detectorID]
+
+    def getDetectorLastStepNewVehiclesCount(self, detectorID):
+        return self.detectorLastStepNewVehiclesCount[detectorID]
+
+    def getDetectorLastStepLeftVehiclesCount(self, detectorID):
+        return self.detectorLastStepLeftVehiclesCount[detectorID]
