@@ -3,10 +3,12 @@ from abc import ABC, abstractmethod
 from trafficLightIntersection import TrafficLightIntersection
 
 class TrafficLightController(ABC):
-    def __init__(self, name):
+    def __init__(self, name, trainFirst = False):
         self.name = name
+        self.trainFirst = trainFirst
+        self.trainningRound = False
 
-    def init(self, sim):        
+    def init(self, sim):  
         # get traffic light ids for this simulation
         self.tLightIds = sim.trafficlight.getIDList()
 
@@ -37,4 +39,17 @@ class TrafficLightController(ABC):
 
     def getName(self):
         return self.name
+
+    def needsTrainning(self):
+        return self.trainFirst
+
+    def setTrainningRound(self, train):
+        self.trainningRound = train 
+
+    def isTrainningRound(self):
+        return self.trainningRound
+
+    
+
+
 
