@@ -21,16 +21,18 @@ class Node():
         self.percent = percent
 
 class WeightedConnection():
-    def __init__(self, reachedTLID, laneID, timeToReach, percent):
+    def __init__(self, endDetectorID, reachedTLID, laneID, timeToReach, percent):
+        self.endDetectorID = endDetectorID
         self.reachedTLID = reachedTLID
         self.laneID = laneID
         self.timeToReach = timeToReach
-        self.reliability = 0
+        self.reliability = 0.5
         self.reliabilities = deque()
         self.reliabilitySum = 0
-        self.maxReliabilities = 20
+        self.maxReliabilities = 100
         for _ in range(self.maxReliabilities):
-            self.reliabilities.append(0)
+            self.reliabilities.append(0.5)
+            self.reliabilitySum += 0.5
 
     def setTLGroupIdx(self, groupIdx):
         self.tlGroupIdx = groupIdx
@@ -45,24 +47,32 @@ class WeightedConnection():
 
         self.reliabilitySum += newReliability
         self.reliability = self.reliabilitySum / self.maxReliabilities
-        #print(int(100 * self.reliability))
 
     def getReliability(self):
         return self.reliability
+
+    def setStartDetectorID(self, detectorID):
+        self.startDetectorID = detectorID
+
+    def getStartDetectorID(self):
+        return self.startDetectorID
+
+    def getEndDetectorID(self):
+        return self.endDetectorID
 
 
 
 class TimedWeight():
     def __init__(self, weightCon: WeightedConnection, timeBeforeArrival, vehicleCount, weight):
         self.weightCon = weightCon
-        self.expectedArrivalStart = timeBeforeArrival * 0.4
+        self.expectedArrivalStart = timeBeforeArrival * 0.8
         self.expectedArrivalEnd = timeBeforeArrival * 1.6
         self.expectedArrivalTimer = 0
 
         self.expectedVehicles = vehicleCount
         self.newArrivedVehicles = 0
 
-        self.timeBeforeAddWeight = max(0, int(timeBeforeArrival) - 10)
+        self.timeBeforeAddWeight = max(0, int(timeBeforeArrival) - 15)
         self.weightDuration = 0
         self.weight = weight
 
@@ -92,7 +102,7 @@ class TimedWeight():
     def addVehiclesArrived(self, newVehiclesCount):
         self.newArrivedVehicles += newVehiclesCount
 
-def bfs(sim, startLaneID, goalLaneIDs):
+def bfs(sim, startLaneID, startTLID, incommingTLLaneIDs, detectorRoadIDToDetectorID, detectorIDToTLID):
     nodesToCheck = deque()
     laneIDsFound = set()
     foundGoals = []
@@ -104,12 +114,19 @@ def bfs(sim, startLaneID, goalLaneIDs):
     while len(nodesToCheck) > 0:
         node: Node = nodesToCheck.popleft()
 
-        if node.laneID in goalLaneIDs:
-            goalTLID = goalLaneIDs[node.laneID]
-            if goalTLID not in foundGoalTLIDs:
-                foundGoalTLIDs.add(goalTLID)
-                foundGoals.append(WeightedConnection(goalTLID, node.laneID, node.timeToReach, node.percent))
-            continue
+        roadID = node.laneID.split("_")[0]
+        if roadID in detectorRoadIDToDetectorID:
+            reachedDetectorID = detectorRoadIDToDetectorID[roadID]
+            reachedTLID = detectorIDToTLID[reachedDetectorID]
+            if reachedTLID != startTLID:
+                if reachedTLID not in foundGoalTLIDs:
+                    foundGoalTLIDs.add(reachedTLID)
+                    foundGoals.append(WeightedConnection(reachedDetectorID, reachedTLID, node.laneID, node.timeToReach, node.percent))
+                continue
+
+        if node.laneID in incommingTLLaneIDs:
+            if incommingTLLaneIDs[node.laneID] != startTLID:
+                continue
         
         #list[(string approachedLane, bool hasPrio, bool isOpen, bool hasFoe, string approachedInternal, string state, string direction, float length)]
         children = sim.lane.getLinks(node.laneID, True)
@@ -131,31 +148,44 @@ class ctrl(TrafficLightController):
     def init(self, sim):
         super().init(sim)
 
-        self.tlWeights = dict()
+        self.detectorWeights = dict()
         for tlInter in self.tlIntersections:
-            groupWeights = []
-            for _ in tlInter.getTrafficLightGroups():
-                groupWeights.append([])
-            self.tlWeights[tlInter.tlID] = groupWeights
+            for group in tlInter.getTrafficLightGroups():
+                for detectorID in group.getLaneDetectorIDs():
+                    self.detectorWeights[detectorID] = []
 
         self.tlIDToTLInter = dict()
         for tlInter in self.tlIntersections:
             self.tlIDToTLInter[tlInter.tlID] = tlInter
+
+        detectorIDToTLID = dict()
+        detectorRoadIDToDetectorID = dict()
+        for tlInter in self.tlIntersections:
+            for group in tlInter.getTrafficLightGroups():
+                for detectorID in group.getLaneDetectorIDs():
+                    detectorIDToTLID[detectorID] = tlInter.tlID
+                    detectorRoadID = detectorID.split("_")[2]
+                    detectorRoadIDToDetectorID[detectorRoadID] = detectorID
+
 
         self.tlweightConnections = dict()
         #each itersection have some number of connections to
         #other intersections. The connections are determined
         #by using a bfs algorithm which will find nearby
         #traffic light intersections
-        for tlIntersection in self.tlIntersections:
-            self.tlweightConnections[tlIntersection.tlID] = []
+        for tlInter in self.tlIntersections:
+            self.tlweightConnections[tlInter.tlID] = dict()
+            for group in tlInter.getTrafficLightGroups():
+                for detectorID in group.getLaneDetectorIDs():
+                    self.tlweightConnections[tlInter.tlID][detectorID] = []
+
 
         #find all the lanes that end at a traffic light
-        goalLaneIDs = dict()
+        incommingTLLaneIDs = dict()
         for tlInter in self.tlIntersections:
             for group in tlInter.getTrafficLightGroups():
                 for incommingTLLaneID in group.getincommingLaneIDs():
-                    goalLaneIDs[incommingTLLaneID] = tlInter.tlID
+                    incommingTLLaneIDs[incommingTLLaneID] = tlInter.tlID
 
         #for eahc outgoing traffic light lane, do bfs
         #to find what traffic lights it's connected to
@@ -163,24 +193,20 @@ class ctrl(TrafficLightController):
         #connections
         for tlInter in self.tlIntersections:
             for group in tlInter.getTrafficLightGroups():
-                for outgoingTLLaneID in group.getoutgoingLaneIDs():
-                    connections = bfs(sim, outgoingTLLaneID, goalLaneIDs)
+                for incommingTLLaneID in group.getincommingLaneIDs():
+                    connections = bfs(sim, incommingTLLaneID, tlInter.tlID, incommingTLLaneIDs, detectorRoadIDToDetectorID, detectorIDToTLID)
                     for connection in connections:
+                        roadID = incommingTLLaneID.split("_")[0]
+                        startDetectorID = detectorRoadIDToDetectorID[roadID]
+                        connection.setStartDetectorID(startDetectorID)
+
                         hasConnection = False
-                        for wCon in self.tlweightConnections[tlInter.tlID]:
-                            if wCon.reachedTLID == connection.reachedTLID:
+                        for wCon in self.tlweightConnections[tlInter.tlID][startDetectorID]:
+                            if wCon.getEndDetectorID() == connection.getEndDetectorID():
                                 hasConnection = True
                                 break
                         if not hasConnection:
-                            conGroupIdx = None
-                            for groupIdx, endTLGroup in enumerate(self.tlIDToTLInter[connection.reachedTLID].getTrafficLightGroups()):
-                                if connection.laneID in endTLGroup.getincommingLaneIDs():
-                                    conGroupIdx = groupIdx
-                                    break
-                            if conGroupIdx is None:
-                                raise Exception("Oh no!")
-                            self.tlweightConnections[tlInter.tlID].append(connection)
-                            connection.setTLGroupIdx(conGroupIdx)
+                            self.tlweightConnections[tlInter.tlID][startDetectorID].append(connection)                            
                             
     def updateLights(self, sim, ticks):
         for tlInter in self.tlIntersections:
@@ -189,13 +215,14 @@ class ctrl(TrafficLightController):
 
             longestQueue = 0
             longestQueueGroup = None
-            for groupIdx, group in enumerate(tlInter.getTrafficLightGroups()):
+            for group in tlInter.getTrafficLightGroups():
                 if tlInter.inGroupsGreenPhase(group) and tlInter.getTimeInCurrentPhase() > 50:
                     continue
                 queueLength = group.getSumLaneDetectorValues()
 
-                for weight in self.tlWeights[tlInter.tlID][groupIdx]:
-                    queueLength += weight.getWeight()
+                for detectorID in group.getLaneDetectorIDs():
+                    for weight in self.detectorWeights[detectorID]:
+                        queueLength += weight.getWeight()
                 
                 if queueLength > longestQueue or longestQueueGroup is None:
                     longestQueue = queueLength
@@ -213,15 +240,16 @@ class ctrl(TrafficLightController):
     
     def updateWeights(self, sim):
         for tlInter in self.tlIntersections:
-            for groupIdx, group in enumerate(tlInter.getTrafficLightGroups()):
-                for weightIdx in reversed(range(len(self.tlWeights[tlInter.tlID][groupIdx]))):
-                    weight = self.tlWeights[tlInter.tlID][groupIdx][weightIdx]
-                    if weight.isValid():
-                        if weight.isInArrivalWindow():
-                            weight.addVehiclesArrived(group.getLastStepNewVehiclesCount())
-                        weight.update()
-                    else:
-                        del self.tlWeights[tlInter.tlID][groupIdx][weightIdx]
+            for group in tlInter.getTrafficLightGroups():
+                for detectorID in group.getLaneDetectorIDs():
+                    for weightIdx in reversed(range(len(self.detectorWeights[detectorID]))):
+                        weight = self.detectorWeights[detectorID][weightIdx]
+                        if weight.isValid():
+                            if weight.isInArrivalWindow():
+                                weight.addVehiclesArrived(group.getDetectorLastStepNewVehiclesCount(weight.weightCon.getEndDetectorID()))
+                            weight.update()
+                        else:
+                            del self.detectorWeights[detectorID][weightIdx]
 
 
         #for each traffic light, if it just switched phase
@@ -240,12 +268,14 @@ class ctrl(TrafficLightController):
                 if tlInter.getTimeInCurrentPhase() % 5 != 0:
                     continue
 
-                weight = group.getSumLaneDetectorValues()
-                #no need to send update if weight is 0
-                #because it won't influence the other
-                #traffic lights
-                if weight == 0:
-                    continue
+                for detectorID in group.getLaneDetectorIDs():
+                    for connection in self.tlweightConnections[tlInter.tlID][detectorID]:
+                        weight = group.getDetectorLastStepLeftVehiclesCount(detectorID)
 
-                for connection in self.tlweightConnections[tlInter.tlID]:
-                    self.tlWeights[connection.reachedTLID][connection.getTLGroupIdx()].append(TimedWeight(connection, connection.timeToReach + 3, weight, weight * connection.getReliability()))
+                        #no need to send update if weight is 0
+                        #because it won't influence the other
+                        #traffic lights
+                        if weight == 0:
+                            continue
+
+                        self.detectorWeights[connection.getEndDetectorID()].append(TimedWeight(connection, connection.timeToReach, weight, weight * connection.getReliability()))
