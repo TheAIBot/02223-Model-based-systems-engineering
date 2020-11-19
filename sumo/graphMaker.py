@@ -317,7 +317,6 @@ if __name__ == '__main__':
     mapFilepath = os.path.join(mapSavePath, "rng1" + ".net.xml")
     sumoTools.createRandomMap(mapFilepath)
     sumoTools.createLaneDetectors(mapFilepath)
-    sumoTools.modifyTrafficLightPhases(mapFilepath)
 
     makeComparisonsSmoothTravelTime(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], 25)
     

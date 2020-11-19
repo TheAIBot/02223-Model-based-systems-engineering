@@ -32,6 +32,7 @@ def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplie
 def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = False):
     additionalFiles = ["lanedetector.xml"]
     if additionalTrafficlighPhases:
+        sumoTools.modifyTrafficLightPhases(mapFilepath)
         additionalFiles.append("trafficlightPhases.xml")
 
     mapFolder = os.path.dirname(mapFilepath)
