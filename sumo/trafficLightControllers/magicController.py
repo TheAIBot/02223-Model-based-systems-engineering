@@ -141,10 +141,13 @@ def bfs(sim, startLaneID, startTLID, incommingTLLaneIDs, detectorRoadIDToDetecto
 class ctrl(TrafficLightController):
 
     def __init__(self):
-        super().__init__("magic stuff")
+        super().__init__("magic stuff", trainFirst=True)
 
     def init(self, sim):
         super().init(sim)
+
+        if not self.isTrainningRound():
+            return
 
         self.detectorWeights = dict()
         for tlInter in self.tlIntersections:
@@ -247,6 +250,7 @@ class ctrl(TrafficLightController):
                                 weight.addVehiclesArrived(group.getDetectorLastStepNewVehiclesCount(weight.weightCon.getEndDetectorID()))
                             weight.update()
                         else:
+                            if self.isTrainningRound():
                                 weight.updateReliability()
                             del self.detectorWeights[detectorID][weightIdx]
 
