@@ -206,6 +206,29 @@ def createBarChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
     plt.savefig(os.path.join(mapGraphPath, fileName))
 
 
+def createLineChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
+
+    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
+
+    # create plot
+    plt.subplots()
+
+    for ctrlIndex, ctrlName in enumerate(yData):
+        plt.plot(xData, yData[ctrlName],
+        color=colors[ctrlIndex],
+        label=ctrlName)
+        
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.legend()
+
+    plt.tight_layout()
+
+    mapGraphPath = getGraphSavePath(mapPath)
+    plt.savefig(os.path.join(mapGraphPath, fileName))
+
+
 def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
     # for every detector length, run the simulation and make some graphs
     xData = tuple(detectorLengths)
@@ -279,7 +302,7 @@ def makeComparisonsSmoothTravelTime(mapPath, ctrls, vehicleInterval):
         data = yData[ctrl]
         print(f"ctrl: {ctrl} has {len(data)} elements")
     
-    createBarChart(mapPath, tuple(xData), yData,
+    createLineChart(mapPath, tuple(xData), yData,
     "Mean travel time (over time)",
     "Time (steps)", "Mean travel time (steps)",
     "vehicle-smoothed-travel-time.pdf")
