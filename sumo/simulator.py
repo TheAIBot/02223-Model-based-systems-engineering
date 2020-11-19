@@ -59,14 +59,15 @@ class SumoSim():
 
         trafficLightController.init(self.sumoCon)
 
-    def run(self):
+    def run(self, takeMeasurements = True):
         measurements = SimMeasurements(1, self.tlCtrl)
 
         ticks = 0
         while self.sumoCon.simulation.getMinExpectedNumber() > 0:
             self.tlCtrl.update(self.sumoCon, ticks)
 
-            measurements.update(self.sumoCon)
+            if takeMeasurements:
+                measurements.update(self.sumoCon)
 
             self.sumoCon.simulationStep()
             ticks += 1
