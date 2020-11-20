@@ -28,10 +28,7 @@ class WeightedConnection():
         self.timeToReach = timeToReach
         self.reliabilities = deque()
         self.reliabilitySum = 0
-        self.maxReliabilities = 100
-        for _ in range(self.maxReliabilities):
-            self.reliabilities.append(0.5)
-            self.reliabilitySum += 0.5
+        self.maxReliabilities = 10000
 
     def setTLGroupIdx(self, groupIdx):
         self.tlGroupIdx = groupIdx
@@ -84,9 +81,10 @@ class TimedWeight():
             self.weightDuration -= 1
 
         self.expectedArrivalTimer += 1
-        if self.expectedArrivalEnd <= self.expectedArrivalTimer:
-            arrivedRatio = min(1, self.newArrivedVehicles / self.expectedVehicles)
-            self.weightCon.updateReliability(arrivedRatio)
+
+    def updateReliability(self):
+        arrivedRatio = min(1, self.newArrivedVehicles / self.expectedVehicles)
+        self.weightCon.updateReliability(arrivedRatio)
 
     def getWeight(self):
         if self.timeBeforeAddWeight > 0:
@@ -144,10 +142,13 @@ def bfs(sim, startLaneID, startTLID, incommingTLLaneIDs, detectorRoadIDToDetecto
 class ctrl(TrafficLightController):
 
     def __init__(self):
-        super().__init__("magic stuff")
+        super().__init__("magic stuff", trainFirst=True)
 
     def init(self, sim):
         super().init(sim)
+
+        if not self.isTrainningRound():
+            return
 
         self.detectorWeights = dict()
         for tlInter in self.tlIntersections:
@@ -250,6 +251,8 @@ class ctrl(TrafficLightController):
                                 weight.addVehiclesArrived(group.getDetectorLastStepNewVehiclesCount(weight.weightCon.getEndDetectorID()))
                             weight.update()
                         else:
+                            if self.isTrainningRound():
+                                weight.updateReliability()
                             del self.detectorWeights[detectorID][weightIdx]
 
 

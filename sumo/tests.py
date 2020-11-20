@@ -17,12 +17,16 @@ modules = {
 
     # dynamic traffic lights using shortest queue first algorithm
     "sqf": shortestQueueFirstTLController,
+
+    # Prediction-based optimization with delay time fairness
+    "fp": fairPrediction,
 }
 
 friendly = {
     "random": "random green phase",
     "lqf": "largest queue first",
     "sqf": "shortest queue first",
+    "fp": "fair prediction",
 }
 
 def test_map(tester, mapPath):

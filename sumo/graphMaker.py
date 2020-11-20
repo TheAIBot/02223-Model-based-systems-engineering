@@ -16,6 +16,12 @@ from simMeasurements import SimMeasurements
 
 
 def getCtrlResult(mapConfigFile, ctrl):
+    #Train once of the controller needs it
+    if ctrl.needsTrainning():
+        ctrl.setTrainningRound(True)
+        simu.SumoSim(mapConfigFile, ctrl).run(takeMeasurements=False)
+        ctrl.setTrainningRound(False)
+
     return simu.SumoSim(mapConfigFile, ctrl).run()
 
 def getCtrlsResults(mapPath, ctrls):
