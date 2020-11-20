@@ -42,6 +42,9 @@ class ctrl(TrafficLightController):
         # the name of the controller as its only argument.
         super().__init__("FP", 'b')
 
+    def init(self, sim):
+        super().init(sim)
+
         # These are the only instance attributes this class has, therefore
         # all methods will operate only on these and will not introduce more.
         self.delay_groups = {}
