@@ -51,11 +51,11 @@ def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = Fa
 
 class SumoSim():
 
-    def __init__(self, mapConfigFilepath, trafficLightController):
+    def __init__(self, mapConfigFilepath, trafficLightController, scale = 1):
         self.tlCtrl = trafficLightController
         self.label = str(self.tlCtrl) + ''.join(random.choice(string.ascii_lowercase) for i in range(20))
 
-        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000", "--no-warnings", "true"], label = self.label)
+        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000", "--no-warnings", "true", "--scale", str(scale)], label = self.label)
         self.sumoCon = traci.getConnection(self.label)
 
         trafficLightController.init(self.sumoCon)

@@ -12,24 +12,26 @@ import trafficLightControllers.staticLights as staticLightCtrl
 import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
 import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
 import trafficLightControllers.magicController as magicCtrl
+import trafficLightControllers.fairPrediction as fairPrediction
 from simMeasurements import SimMeasurements
 
 
-def getCtrlResult(mapConfigFile, ctrl):
+def getCtrlResult(mapConfigFile, ctrl, density):
     #Train once of the controller needs it
     if ctrl.needsTrainning():
         ctrl.setTrainningRound(True)
-        simu.SumoSim(mapConfigFile, ctrl).run(takeMeasurements=False)
+        simu.SumoSim(mapConfigFile, ctrl, scale=density).run(takeMeasurements=False)
         ctrl.setTrainningRound(False)
 
-    return simu.SumoSim(mapConfigFile, ctrl).run()
+    return simu.SumoSim(mapConfigFile, ctrl, scale=density).run()
 
-def getCtrlsResults(mapPath, ctrls):
+def getCtrlsResults(mapPath, ctrls, densities = None):
     mapConfigFile = simu.createSimSumoConfigWithRandomTraffic(mapPath, additionalTrafficlighPhases=True)
 
     simsData = []
-    for ctrl in ctrls:
-        simsData.append((mapConfigFile, ctrl))
+    for density in densities or [1]:
+        for ctrl in ctrls:
+            simsData.append((mapConfigFile, ctrl, density))
 
     with Pool(cpu_count()) as mpPool:
         return mpPool.starmap(getCtrlResult, simsData)
@@ -41,23 +43,15 @@ def getCtrlsResults(mapPath, ctrls):
 
 
 def getCtrlsDensityResults(mapPath, ctrls, trafficThroughputMultipliers):
-    results = []
-    mapConfigs = {}
+    results = getCtrlsResults(mapPath, ctrls, densities = trafficThroughputMultipliers)
+    multResults = []
+    for ctrlIdx, _ in enumerate(ctrls):
+        res = dict()
+        for denIdx, density in enumerate(trafficThroughputMultipliers):
+            res[density] = results[ctrlIdx + denIdx * len(ctrls)]
+        multResults.append(res)
 
-    for mult in trafficThroughputMultipliers:
-        print(f"Generating map with trafficThroughputMultiplier: {mult}")
-        mapConfigs[mult] = simu.createSimSumoConfigWithRandomTraffic(mapPath, mult)
-
-    for ctrl in ctrls:
-        multResults = {}
-        for mult in trafficThroughputMultipliers:
-            print(f"Testing controller: {ctrl.getName()}, with trafficThroughputMultiplier: {mult}")
-            mapConfigFile = mapConfigs[mult]
-            sSim = simu.SumoSim(mapConfigFile, ctrl)
-            multResults[mult] = sSim.run()
-        results.append(multResults)
-
-    return results
+    return multResults
 
 
 def getGraphSavePath(mapPath):
@@ -174,7 +168,7 @@ def makeDensityComparisons(mapPath, ctrls, trafficThroughputMultipliers):
             meanTravelTime = data.getAverageTravelTime()
             yData[ctrlName].append(meanTravelTime)
             
-    createBarChart(mapPath, xData, yData, 
+    createLineChart(mapPath, xData, yData, 
     "Mean travel time, traffic density", 
     "Traffic density", "Mean travel time (steps)",
     "vehicle-density-mean-travel-time.pdf")
@@ -324,9 +318,13 @@ if __name__ == '__main__':
     sumoTools.createRandomMap(mapFilepath)
     sumoTools.createLaneDetectors(mapFilepath)
 
-    makeComparisonsSmoothTravelTime(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], 25)
+    #makeComparisonsSmoothTravelTime(mapFilepath, [staticLightCtrl.ctrl(), fairPrediction.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], 2000)
     
     #makeComparisonsDetectorLengths(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [5, 10, 20, 50, 100, 150, 200])
     #makeComparisons("random_map/rng1.net.xml", [largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()])
     #makeComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
-    #makeDensityComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], [1, 2, 3, 4, 5])
+
+    densities = []
+    for density in range(20, 101):
+        densities.append(density / 20)
+    makeDensityComparisons(mapFilepath, [staticLightCtrl.ctrl(), fairPrediction.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], densities)
