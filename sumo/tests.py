@@ -3,29 +3,33 @@
 import unittest
 import sumoTools
 import simulator as sim
-from trafficLightControllers import *
+import trafficLightControllers.staticLights as staticCtrl
+import trafficLightControllers.randomTLController as randCtrl
+import trafficLightControllers.largestQueueFirstTLController as lqfCtrl
+import trafficLightControllers.magicController as weightlqfCtrl
+import trafficLightControllers.fairPrediction as fairCtrl
 
 modules = {
     # normal traffic lights using phase
-    "static": staticLights,
+    "static": staticCtrl,
 
     # dynamic traffic lights using random green phases
-    "random": randomTLController,
+    "random": randCtrl,
 
     # dynamic traffic lights using largest queue first algorithm
-    "lqf": largestQueueFirstTLController,
+    "lqf": lqfCtrl,
 
-    # dynamic traffic lights using shortest queue first algorithm
-    "sqf": shortestQueueFirstTLController,
+    # dynamic traffic lights using weight-based lqf
+    "weight-lqf": weightlqfCtrl,
 
     # Prediction-based optimization with delay time fairness
-    "fp": fairPrediction,
+    "fp": fairCtrl,
 }
 
 friendly = {
     "random": "random green phase",
     "lqf": "largest queue first",
-    "sqf": "shortest queue first",
+    "weight-lqf": "weight-based largest queue first",
     "fp": "fair prediction",
 }
 

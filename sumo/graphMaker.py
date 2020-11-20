@@ -8,10 +8,12 @@ from multiprocessing import Pool, cpu_count
 
 import sumoTools
 import simulator as simu
-import trafficLightControllers.staticLights as staticLightCtrl
-import trafficLightControllers.largestQueueFirstTLController as largestQueueFirstLightCtrl
-import trafficLightControllers.shortestQueueFirstTLController as shortestQueueFirstLightCtrl
-import trafficLightControllers.magicController as magicCtrl
+import trafficLightControllers.staticLights as staticCtrl
+import trafficLightControllers.randomTLController as randCtrl
+import trafficLightControllers.largestQueueFirstTLController as lqfCtrl
+import trafficLightControllers.magicController as weightlqfCtrl
+import trafficLightControllers.fairPrediction as fairCtrl
+
 from simMeasurements import SimMeasurements
 
 
@@ -73,8 +75,8 @@ def getGraphSavePath(mapPath):
     return mapGraphPath
 
 
-def createHistogram(mapPath, data, dens, name, title, xlabel, ylabel, fileName):
-    plt.hist(data, density = dens, bins = 30, label = name)
+def createHistogram(mapPath, data, dens, name, colors, title, xlabel, ylabel, fileName):
+    plt.hist(data, density = dens, bins = 30, color = colors, label = name)
 
     plt.legend(loc="upper left")
     plt.title(title)
@@ -89,73 +91,75 @@ def createHistogram(mapPath, data, dens, name, title, xlabel, ylabel, fileName):
 def getVehicleHistogramData(results, dataSelector):
     histData = []
     histNames = []
+    histColors = []
     for result in results:
         resultData = []
         for veh in result.vehiclesData.values():
             resultData.append(dataSelector(veh))
         histData.append(resultData)
         histNames.append(result.getControllerName())
+        histColors.append(result.getGraphColor())
 
-    return histData, histNames
+    return histData, histNames, histColors
 
 
 def makeComparisons(mapPath, ctrls):
     results = getCtrlsResults(mapPath, ctrls)
 
-    histData, histNames = getVehicleHistogramData(results, lambda x: x.getTravelTime())
+    histData, histNames, histColors = getVehicleHistogramData(results, lambda x: x.getTravelTime())
     createHistogram(mapPath, histData, True, 
-        histNames, 
+        histNames, histColors,
         "Vehicle travel time", 
         "Time (steps)", "Density (vehicle)",
             "vehicle-travel-time.pdf")
 
-    histData, histNames = getVehicleHistogramData(results, lambda x: x.getEmissions().getCOEmissions())
+    histData, histNames, histColors = getVehicleHistogramData(results, lambda x: x.getEmissions().getCOEmissions())
     # NOT A DENSITY DIAGRAM (yes or no?)
     # x axis is wrong?
     createHistogram(mapPath, histData, False, 
-        histNames, 
+        histNames, histColors,
         "Vehicle Carbon Monoxide (CO) emissions", 
-        "Time (steps)", "CO (mg)",
+        "CO (mg)", "Number of vehicles",
             "vehicle-CO-emissions.pdf")
 
-    histData, histNames = getVehicleHistogramData(results, lambda x: x.getEmissions().getCO2Emissions())
+    histData, histNames, histColors = getVehicleHistogramData(results, lambda x: x.getEmissions().getCO2Emissions())
     # NOT A DENSITY DIAGRAM (yes or no?)
     createHistogram(mapPath, histData, False, 
-        histNames, 
+        histNames, histColors,
         "Vehicle Carbon Dioxide (CO2) emissions", 
-        "Time (steps)", "CO2 (mg)",
+        "CO2 (mg)", "Number of vehicles",
             "vehicle-CO2-emissions.pdf")
 
-    histData, histNames = getVehicleHistogramData(results, lambda x: x.getEmissions().getHCEmissions())
+    histData, histNames, histColors = getVehicleHistogramData(results, lambda x: x.getEmissions().getHCEmissions())
     # NOT A DENSITY DIAGRAM (yes or no?)
     createHistogram(mapPath, histData, False, 
-        histNames, 
+        histNames, histColors,
         "Vehicle Hydrocarbon (HC) emissions", 
-        "Time (steps)", "HC (mg)",
+        "HC (mg)", "Number of vehicles",
             "vehicle-HC-emissions.pdf")
 
-    histData, histNames = getVehicleHistogramData(results, lambda x: x.getEmissions().getPMXEmissions())
+    histData, histNames, histColors = getVehicleHistogramData(results, lambda x: x.getEmissions().getPMXEmissions())
     # NOT A DENSITY DIAGRAM (yes or no?)
     createHistogram(mapPath, histData, False, 
-        histNames, 
+        histNames, histColors,
         "Vehicle Particulate Matter (PM) emissions", 
-        "Time (steps)", "PM (mg)",
+        "PM (mg)", "Number of vehicles",
             "vehicle-PMx-emissions.pdf")
 
-    histData, histNames = getVehicleHistogramData(results, lambda x: x.getEmissions().getNOXEmissions())
+    histData, histNames, histColors = getVehicleHistogramData(results, lambda x: x.getEmissions().getNOXEmissions())
     # NOT A DENSITY DIAGRAM (yes or no?)
     createHistogram(mapPath, histData, False, 
-        histNames, 
+        histNames, histColors,
         "Vehicle Nitrogen Oxides (NOx) emissions", 
-        "Time (steps)", "NOx (mg)",
+        "NOx (mg)", "Number of vehicles",
             "vehicle-NOx-emissions.pdf")
 
-    histData, histNames = getVehicleHistogramData(results, lambda x: x.getEmissions().getFuelConsumption())
+    histData, histNames, histColors = getVehicleHistogramData(results, lambda x: x.getEmissions().getFuelConsumption())
     # NOT A DENSITY DIAGRAM (yes or no?)
     createHistogram(mapPath, histData, False, 
-        histNames, 
+        histNames, histColors,
         "Vehicle Fuel consumption", 
-        "Time (steps)", "Fuel (ml)",
+        "Fuel (ml)", "Number of vehicles",
             "vehicle-fuel-emissions.pdf")
 
 
@@ -212,10 +216,7 @@ def createBarChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
     plt.savefig(os.path.join(mapGraphPath, fileName))
 
 
-def createLineChart(mapPath, xData, yData, title, xlabel, ylabel, fileName):
-
-    colors = ['b', 'g', 'r', 'c', 'm', 'y', 'k']
-
+def createLineChart(mapPath, xData, yData, colors, title, xlabel, ylabel, fileName):
     # create plot
     plt.subplots()
 
@@ -243,7 +244,7 @@ def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
     results = {}
     for length in detectorLengths:
         print(f"Testing map: {mapPath} with lane detector length: {length}")
-        sumoTools.createLaneDetectors(mapFilepath, length)
+        sumoTools.createLaneDetectors(mapPath, length)
         results[length] = getCtrlsResults(mapPath, ctrls)
 
     for length in results:
@@ -271,9 +272,11 @@ def makeComparisonsSmoothTravelTime(mapPath, ctrls, vehicleInterval):
     results = getCtrlsResults(mapPath, ctrls)
 
     sortedData = {}
+    colors = []
 
     for result in results:
         name = result.getControllerName()
+        colors.append(result.getGraphColor())
         sortedData[name] = []
         for vechData in result.vehiclesData.values():
             sortedData[name].append(vechData)
@@ -302,13 +305,13 @@ def makeComparisonsSmoothTravelTime(mapPath, ctrls, vehicleInterval):
             yData[ctrl].append(meanTravelTime)
         firstIteration = False
 
-    print(f"xData start time length: {len(xData)}")
+    # print(f"xData start time length: {len(xData)}")
 
-    for ctrl in yData:
-        data = yData[ctrl]
-        print(f"ctrl: {ctrl} has {len(data)} elements")
+    # for ctrl in yData:
+    #     data = yData[ctrl]
+    #     print(f"ctrl: {ctrl} has {len(data)} elements")
     
-    createLineChart(mapPath, tuple(xData), yData,
+    createLineChart(mapPath, tuple(xData), yData, colors,
     "Mean travel time (over time)",
     "Time (steps)", "Mean travel time (steps)",
     "vehicle-smoothed-travel-time.pdf")
@@ -324,9 +327,9 @@ if __name__ == '__main__':
     sumoTools.createRandomMap(mapFilepath)
     sumoTools.createLaneDetectors(mapFilepath)
 
-    makeComparisonsSmoothTravelTime(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], 25)
-    
-    #makeComparisonsDetectorLengths(mapFilepath, [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()], [5, 10, 20, 50, 100, 150, 200])
-    #makeComparisons("random_map/rng1.net.xml", [largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()])
-    #makeComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl()])
-    #makeDensityComparisons("testMaps/1-3TL3W-Intersection/network.net.xml", [staticLightCtrl.ctrl(), largestQueueFirstLightCtrl.ctrl(), magicCtrl.ctrl()], [1, 2, 3, 4, 5])
+    ctrls = [staticCtrl.ctrl(), lqfCtrl.ctrl()]
+
+    #makeComparisons(mapFilepath, ctrls)
+    #makeComparisonsSmoothTravelTime(mapFilepath, ctrls, 100)
+    #makeDensityComparisons(mapFilepath, ctrls, [1, 2, 3, 4, 5])
+    makeComparisonsDetectorLengths(mapFilepath, ctrls, [1, 20])

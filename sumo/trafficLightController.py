@@ -3,9 +3,10 @@ from abc import ABC, abstractmethod
 from trafficLightIntersection import TrafficLightIntersection
 
 class TrafficLightController(ABC):
-    def __init__(self, name, trainFirst = False):
+    def __init__(self, name, graphColor, trainFirst = False):
         self.name = name
         self.trainFirst = trainFirst
+        self.graphColor = graphColor
         self.trainningRound = False
 
     def init(self, sim):  
@@ -49,7 +50,5 @@ class TrafficLightController(ABC):
     def isTrainningRound(self):
         return self.trainningRound
 
-    
-
-
-
+    def getGraphColor(self):
+        return self.graphColor

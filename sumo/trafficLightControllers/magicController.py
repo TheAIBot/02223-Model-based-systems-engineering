@@ -142,7 +142,7 @@ def bfs(sim, startLaneID, startTLID, incommingTLLaneIDs, detectorRoadIDToDetecto
 class ctrl(TrafficLightController):
 
     def __init__(self):
-        super().__init__("magic stuff", trainFirst=True)
+        super().__init__("Weight-LQF", 'r', trainFirst=True)
 
     def init(self, sim):
         super().init(sim)

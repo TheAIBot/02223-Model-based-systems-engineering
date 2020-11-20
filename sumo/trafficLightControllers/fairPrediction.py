@@ -40,7 +40,7 @@ class ctrl(TrafficLightController):
 
         # The constructor of TrafficLightController expects
         # the name of the controller as its only argument.
-        super().__init__("Fair prediction")
+        super().__init__("FP", 'b')
 
         # These are the only instance attributes this class has, therefore
         # all methods will operate only on these and will not introduce more.
