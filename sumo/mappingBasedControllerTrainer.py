@@ -3,41 +3,64 @@ import time
 import random
 import sumoTools
 import simulator as sim
+from multiprocessing import Pool, cpu_count
 from trafficLightControllers import mappingBasedController
 
 
+def getResult(config, mapConfigFile, maxSteps):
+    newController = mappingBasedController.ctrl(config)  # lqf 5676
+    newResult = sim.SumoSim(mapConfigFile, newController).run(True, maxSteps)
+    return newResult.getTotalRuntime()
+
+
 def test_map(mapPath):
-    bits = 125
+    bits = 10
+    startMax = 6000
     sumoTools.createLaneDetectors(mapPath)
     mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapPath)
 
     random.seed(time.time())
+    config, resultInt = GetInitial(bits, mapConfigFile, startMax)
 
-    for _ in range(100):
-        config = random.randint(0, 1 << bits)
-        controller = mappingBasedController.ctrl(config)
-        result = sim.SumoSim(mapConfigFile, controller).run()
+    append_if_not_exists("results.txt", f"config {config} total {resultInt}")
+    if(resultInt >= startMax):
+        return
+
+    while True:
+        processData = []
+        for i in range(bits):
+            newConfig = config ^ (1 << i)
+            processData.append((newConfig, mapConfigFile, resultInt))
+
+        results = []
+        with Pool(cpu_count()) as mpPool:
+            results = mpPool.starmap(getResult, processData)
+
+        indMin = results.index(min(results))
+        config = config ^ (1 << (indMin))
+
         append_if_not_exists(
-            "results.txt", f"config {config} total {result.getTotalRuntime()} average {result.getAverageTravelTime()}")
+            "results.txt", f"config {config} total {min(results)}")
 
-        resultInt = result.getTotalRuntime()
+        if results[indMin] == resultInt:
+            break
 
-        while True:
-            results = [resultInt]
-            for i in range(bits):
-                newConfig = config ^ (1 << i)
-                newController = mappingBasedController.ctrl(newConfig)
-                newResult = sim.SumoSim(mapConfigFile, newController).run()
-                results.append(newResult.getTotalRuntime())
-                append_if_not_exists(
-                    "results.txt", f"config {newConfig} total {newResult.getTotalRuntime()} average {newResult.getAverageTravelTime()}")
+        resultInt = results[indMin]
 
-            indMin = results.index(min(results))
-            if results[indMin] == resultInt:
-                break
+def GetInitial(bits, mapConfigFile, startMax):
+    processData = []
+    for _ in range(cpu_count()):
+        newConfig = random.randint(0, 1 << bits)
+        processData.append((newConfig, mapConfigFile, startMax))
 
-            config = config ^ (1 << (indMin-1))
-            resultInt = results[indMin]
+    results = []
+    with Pool(cpu_count()) as mpPool:
+        results = mpPool.starmap(getResult, processData)
+
+    imin = results.index(min(results))
+    config = processData[imin][0]
+    resultInt = min(results)
+    return config, resultInt
 
 
 def append_if_not_exists(filename, string):
@@ -52,4 +75,4 @@ def append_if_not_exists(filename, string):
 
 
 if __name__ == '__main__':
-    test_map("testMaps/4-4TL4W-Intersection-LARGE/network.net.xml")
+    test_map("testMaps/4-4TL4W-Intersection/network.net.xml")

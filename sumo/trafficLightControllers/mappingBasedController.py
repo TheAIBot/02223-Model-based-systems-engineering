@@ -58,8 +58,7 @@ class ctrl(TrafficLightController):
         return timeSinceLastChangeMapped
 
     def getMappedWaiting(group):
-        waitingValues = group.getLaneDetectorValues()
-        waiting = sum(waitingValues)
+        waiting = group.getSumLaneDetectorValues()
         waitingMapped = 0
         for i, val in enumerate(ctrl.intervals):
             if waiting > val:
