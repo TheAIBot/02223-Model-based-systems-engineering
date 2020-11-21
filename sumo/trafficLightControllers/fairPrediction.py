@@ -7,29 +7,27 @@
 # I will go with this assumption while implementing this algorithm.
 # TODO If the step length changes in the future, this needs to be adapted too.
 STEP_LENGTH = 1.0
-HISTORY_LEN = 15 * 60
-SPLIT_MIN = 20
-CYCLE_MIN = 120
-CYCLE_MAX = 240
+
+# The number of seconds of the past that will be used for prediction
+HISTORY_LEN = 5 * 60
+
+# Whether or not to prefer recent history over old history
+RECENCY_BIAS = True
+
+# Defines the curve: 1.0 is linear, 2.0 is quadratic, 3.0 is cubic...
+RECENCY_BIAS_EXPONENT = 1.5
+
+# Decay of preference to remain in the current phase (time to half)
+LAZINESS_DECAY = 5
+
+# Decay of patience to remain in the current phase (time to half)
+# Note: this is a maximum value and will be lowered based on traffic volume
+PATIENCE_DECAY = 100
+
 DEBUG = False
 
 from trafficLightController import TrafficLightController
 import math
-
-def signed_devs(arr):
-    count = len(arr)
-    if count == 0:
-        return 0
-    mean = sum(arr) / count
-    return [entry - mean for entry in arr]
-
-def stdev(arr):
-    count = len(arr)
-    if count == 0:
-        return 0
-    mean = sum(arr) / count
-    devs = [math.pow(entry - mean, 2) for entry in arr]
-    return math.sqrt(sum(devs) / count)
 
 # This class is the main entry point of this traffic light controller.
 # The test execution environment requires this class to be called 'ctrl'.
@@ -48,7 +46,9 @@ class ctrl(TrafficLightController):
         # These are the only instance attributes this class has, therefore
         # all methods will operate only on these and will not introduce more.
         self.delay_groups = {}
-        self.cycle_plans = {}
+        self.last_switch = {}
+        self.last_target = {}
+        self.backoff = {}
 
     # This method is called in each step by TrafficLightController's
     # update() method with up-to-date data in tlIntersection.
@@ -61,15 +61,9 @@ class ctrl(TrafficLightController):
         for inters in self.tlIntersections:
             iID = inters.tlID
             groups = inters.getTrafficLightGroups()
+            count = len(groups)
+            delay_group = []
 
-            if iID not in self.cycle_plans:
-                self.cycle_plans[iID] = Plan(seconds, len(groups))
-            plan = self.cycle_plans[iID]
-
-            cycle_over = plan.is_over(seconds)
-
-            totals = []
-            means = []
             for i, group in enumerate(groups):
                 # Create a unique ID for each group, derived from:
                 #  - the ID of the intersection the group belongs to,
@@ -85,76 +79,99 @@ class ctrl(TrafficLightController):
                 # Feed the current list of vehicle IDs into the Delays instance
                 delays.update(seconds, group.getVehicleIDsFromDetectors())
 
-                #if cycle_over:
                 delays.clear_before(seconds - HISTORY_LEN)
-                totals.append(delays.total(seconds))
-                means.append(delays.mean(seconds))
+                delay_group.append(delays)
 
-            if cycle_over:
-                if DEBUG:
-                    print("########################################")
-                plan.update(seconds, totals, means)
+            if iID not in self.last_target:
+                self.last_target[iID] = 0
+            last_target = self.last_target[iID]
 
-            inters.setGroupAsGreen(groups[plan.get_target(seconds)], sim)
+            if iID not in self.backoff:
+                self.backoff[iID] = False
 
-            # The lower, the better
-            if DEBUG:
-                efficiency = sum(totals)
-                fairness = stdev(means)
-                print("### eff {:>15.4} fai {:>15.4}".format(efficiency, fairness))
+            if self.backoff[iID]:
+                if inters.inGroupsGreenPhase(groups[last_target]):
+                    self.backoff[iID] = False
+                    self.last_switch[iID] = seconds
+                else:
+                    pass
+                    #inters.setGroupAsGreen(groups[last_target], sim)
+                continue
 
-class Plan:
+            if iID not in self.last_switch:
+                self.last_switch[iID] = seconds
+            last_switch = self.last_switch[iID]
 
-    def __init__(self, seconds, count):
-        split = max(SPLIT_MIN, CYCLE_MIN / count)
-        self.splits = [split] * count
-        self.update_timestamps(seconds)
-        self.last_total = 0
+            # Used to make a decision in low traffic
+            hysteresis = [
+                math.log(delay_group[i].total(seconds) + 1)
+                for i in range(count)
+            ]
 
-    def update_timestamps(self, seconds):
-        base = seconds
-        timestamps = []
-        for split in self.splits:
-            base += split
-            timestamps.append(base)
-        if DEBUG:
-            print("{} at {}".format(timestamps, seconds))
-        self.timestamps = timestamps
+            # Used to react quickly to change in traffic
+            pressure = [
+                math.log(delay_group[i].total_present(seconds) + 1)
+                for i in range(count)
+            ]
 
-    def is_over(self, seconds):
-        return self.timestamps[-1] <= seconds
+            # Used to provide fairness in high traffic
+            neglect = [
+                math.log(delay_group[i].mean(seconds) + 1)
+                for i in range(count)
+            ]
 
-    def get_target(self, seconds):
-        return len(list(filter(
-            lambda timestamp: timestamp <= seconds,
-            self.timestamps
-        )))
+            # Reflects the amount of traffic
+            volume = sum(hysteresis) / count
 
-    # TODO This needs tuning, especially for variable cycle length
-    def update(self, seconds, totals, means):
-        if len(totals) != len(means) != len(self.splits):
-            raise Exception("Argument length mismatch in Plan.update()")
+            laziness = 2 ** (0 - (seconds - last_switch) / LAZINESS_DECAY)
+            patience = 2 ** \
+                (1 - (seconds - last_switch) / (PATIENCE_DECAY / (volume + 1)))
+            patience = min(1, patience)
 
-        count = len(self.splits)
-        deviations = signed_devs(means)
-        if DEBUG:
-            print("### Deviations: {}".format(deviations))
-
-        for i in range(count):
-            old = self.splits[i]
-            dev = deviations[i]
-            self.splits[i] = max(SPLIT_MIN, old + dev)
-
-        cycle = sum(self.splits)
-        mul = min(1, CYCLE_MAX / cycle) * max(1, CYCLE_MIN / cycle)
-
-        if mul != 1:
+            scores = [0] * count
             for i in range(count):
-                self.splits[i] *= mul
+                score = 1
+                score *= (hysteresis[i] + 1) / (volume + 1)
+                score *= pressure[i] + 1
+                score *= (neglect[i] + 1) * (volume + 1)
+                scores[i] = score
 
-        if DEBUG:
-            print("### Splits: {} {}".format(self.splits, sum(self.splits)))
-        self.update_timestamps(seconds)
+            scores[last_target] *= laziness * volume + 1
+            scores[last_target] *= patience
+
+            highest = max(scores)
+            # Prefer the current target if it's a tie
+            if scores[last_target] == highest:
+                target = last_target
+            else:
+                target = scores.index(highest)
+
+            if target != last_target:
+                self.last_target[iID] = target
+                self.backoff[iID] = True
+
+            inters.setGroupAsGreen(groups[target], sim)
+
+            if DEBUG:
+                print(
+                    "\n### {:>4s} [l{:>7.2f}][p{:>7.2f}]"
+                    .format(iID, laziness, patience)
+                )
+                print_table(
+                    hysteresis, pressure, volume, neglect, scores, target
+                )
+
+def print_table(h, p, v, n, s, t):
+    print("### hyst {}".format(fmt_arr(h, "[{:>8.2f}]")))
+    print("### pres {}[v{:>7.2f}]".format(fmt_arr(p, "[{:>8.2f}]"), v))
+    print("### negl {}".format(fmt_arr(n, "[{:>8.2f}]")))
+    print("### scor {}".format(fmt_arr(s, "[{:>8.2f}]")))
+    print("### targ {}".format(
+        fmt_arr(['#'*8 if i == t else '' for i in range(len(s))], "[{:8}]"))
+    )
+
+def fmt_arr(arr, fmt):
+    return ''.join([fmt.format(e) for e in arr])
 
 class Delays:
 
@@ -188,10 +205,7 @@ class Delays:
                 continue
 
             # Store arrival timestamp of new vehicles
-            self.arrivals[vID] = seconds
-        if DEBUG:
-            print("+" * len(self.arrivals), end='')
-            print("-" * len(self.departed))
+            self.arrivals[vID] = seconds - 1
 
     # Clears stored delays of vehicles that have left the detector
     def clear_departed(self):
@@ -204,20 +218,36 @@ class Delays:
             self.departed
         ))
 
+    def __weight(self, seconds, departtime, bias_exp):
+        if not RECENCY_BIAS:
+            return 1
+        age = seconds - departtime
+        weight = (HISTORY_LEN - age) / HISTORY_LEN
+        return max(0, min(weight, 1)) ** bias_exp
+
+    def count_past(self, seconds, bias_exp=RECENCY_BIAS_EXPONENT):
+        if not RECENCY_BIAS:
+            return len(self.departed)
+        count = 0
+        for departure in self.departed:
+            count += self.__weight(seconds, departure.timestamp, bias_exp)
+        return count
+
     def total_present(self, seconds):
-        total = 0.0
+        total = 0
         for vID, arrival in self.arrivals.items():
             total += seconds - arrival
         return total
 
-    def total_past(self):
-        total = 0.0
+    def total_past(self, seconds, bias_exp=RECENCY_BIAS_EXPONENT):
+        total = 0
         for departure in self.departed:
-            total += departure.delay
+            weight = self.__weight(seconds, departure.timestamp, bias_exp)
+            total += departure.delay * weight
         return total
 
-    def total(self, seconds):
-        return self.total_present(seconds) + self.total_past()
+    def total(self, seconds, bias_exp=RECENCY_BIAS_EXPONENT):
+        return self.total_present(seconds) + self.total_past(seconds, bias_exp)
 
     def mean_present(self, seconds):
         count = len(self.arrivals)
@@ -226,19 +256,19 @@ class Delays:
         else:
             return self.total_present(seconds) / count
 
-    def mean_past(self):
-        count = len(self.departed)
+    def mean_past(self, seconds, bias_exp=RECENCY_BIAS_EXPONENT):
+        count = self.count_past(seconds, bias_exp)
         if count == 0:
             return 0
         else:
-            return self.total_past() / count
+            return self.total_past(seconds, bias_exp) / count
 
-    def mean(self, seconds):
-        count = len(self.arrivals) + len(self.departed)
+    def mean(self, seconds, bias_exp=RECENCY_BIAS_EXPONENT):
+        count = len(self.arrivals) + self.count_past(seconds, bias_exp)
         if count == 0:
             return 0
         else:
-            return self.total(seconds) / count
+            return self.total(seconds, bias_exp) / count
 
 class Departure:
 
