@@ -128,7 +128,7 @@ def bfs(sim, startLaneID, startTLID, incommingTLLaneIDs, detectorRoadIDToDetecto
                 continue
         
         #list[(string approachedLane, bool hasPrio, bool isOpen, bool hasFoe, string approachedInternal, string state, string direction, float length)]
-        children = sim.lane.getLinks(node.laneID, True)
+        children = sim.lane.getLinks(node.laneID)
         for child in children:
             childLaneID = child[0]
             if childLaneID not in laneIDsFound:

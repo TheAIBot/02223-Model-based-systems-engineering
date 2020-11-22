@@ -23,7 +23,7 @@ else:
     sys.exit("please declare environment variable 'SUMO_HOME'")
 
 from sumolib import checkBinary  # noqa
-import traci  # noqa
+import libsumo
 
 def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.5, additionalTrafficlighPhases = False):
     routeFile = sumoTools.generateRoutes(mapFilepath, 50, 100, trafficThroughputMultiplier)
@@ -55,31 +55,30 @@ class SumoSim():
         self.tlCtrl = trafficLightController
         self.label = str(self.tlCtrl) + ''.join(random.choice(string.ascii_lowercase) for i in range(20))
 
-        traci.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000", "--no-warnings", "true", "--scale", str(scale)], label = self.label)
-        self.sumoCon = traci.getConnection(self.label)
+        libsumo.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000", "--no-warnings", "true", "--scale", str(scale)])
 
-        trafficLightController.init(self.sumoCon)
+        trafficLightController.init(libsumo)
 
     def run(self, takeMeasurements = True, maxTicks = 100000, ticksStartBreaking = 100000, maxAverage = 1000000):
         measurements = SimMeasurements(1, self.tlCtrl)
 
         ticks = 0
-        while self.sumoCon.simulation.getMinExpectedNumber() > 0:
-            self.tlCtrl.update(self.sumoCon, ticks)
+        while libsumo.simulation.getMinExpectedNumber() > 0:
+            self.tlCtrl.update(libsumo, ticks)
 
             if takeMeasurements:
-                measurements.update(self.sumoCon)
+                measurements.update(libsumo)
 
-            self.sumoCon.simulationStep()
+            libsumo.simulationStep()
             if ticks>ticksStartBreaking and measurements.getAverageTravelTime()>maxAverage:
                 break
             ticks += 1
             if ticks > maxTicks:
                 break
 
-        measurements.collectAfterSimEnd(self.sumoCon)
+        measurements.collectAfterSimEnd(libsumo)
 
-        self.sumoCon.close()
+        libsumo.close()
         sys.stdout.flush()
 
         return measurements
