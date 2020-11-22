@@ -25,8 +25,7 @@ class ctrl(TrafficLightController):
         for tlIntersection in self.tlIntersections:
             groups = tlIntersection.getTrafficLightGroups()
             if len(groups) != 2:
-                raise Exception(
-                    "mapping based controller only handles intersections with 2 groups")
+                continue
 
             group1 = groups[0]
             group2 = groups[1]

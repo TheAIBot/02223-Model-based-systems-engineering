@@ -14,9 +14,8 @@ def getResult(config, mapConfigFile, maxSteps):
 
 
 def test_map(mapPath):
-    bits = 10
-    startMax = 6000
-    sumoTools.createLaneDetectors(mapPath)
+    bits = 125
+    startMax = 3500
     mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapPath)
 
     random.seed(time.time())
@@ -47,6 +46,9 @@ def test_map(mapPath):
 
         resultInt = results[indMin]
 
+    append_if_not_exists("results.txt", "Converged")
+
+
 def GetInitial(bits, mapConfigFile, startMax):
     processData = []
     for _ in range(cpu_count()):
@@ -75,4 +77,11 @@ def append_if_not_exists(filename, string):
 
 
 if __name__ == '__main__':
-    test_map("testMaps/4-4TL4W-Intersection/network.net.xml")
+    mapSavePath = "random_map"
+    if not os.path.isdir(mapSavePath):
+        os.mkdir(mapSavePath)
+    mapFilepath = os.path.join(mapSavePath, "rng1" + ".net.xml")
+    sumoTools.createRandomMap(mapFilepath)
+    sumoTools.createLaneDetectors(mapFilepath)
+    while True:
+        test_map(mapFilepath)
