@@ -49,7 +49,7 @@ class TrafficLightGroup():
                 else:
                     prevDetectorVehicleCount -= 1
                 self.currentStepDetectorVehicles[detectorID].append(vehicleID)
-                self.detectorLastStepLeftVehiclesCount[detectorID] = prevDetectorVehicleCount
+            self.detectorLastStepLeftVehiclesCount[detectorID] = prevDetectorVehicleCount
 
     def getLaneDetectorValues(self):
         detectorValues = dict()
