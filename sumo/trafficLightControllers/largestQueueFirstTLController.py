@@ -3,7 +3,7 @@ from trafficLightController import TrafficLightController
 class ctrl(TrafficLightController):
 
     def __init__(self):
-        super().__init__("Largest queue first")
+        super().__init__("LQF", 'g')
 
     def updateLights(self, sim, ticks):
         for tlInter in self.tlIntersections:

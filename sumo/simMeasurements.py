@@ -7,6 +7,7 @@ class SimMeasurements():
         self.vehiclesData = dict()
         self.vehicleCollisionCount = 0
         self.ctrlName = tlCtrl.getName()
+        self.ctrlGraphColor = tlCtrl.getGraphColor()
 
     def update(self, sim):
         allSubscribedData = sim.vehicle.getAllSubscriptionResults()
@@ -55,3 +56,6 @@ class SimMeasurements():
 
     def getControllerName(self):
         return self.ctrlName
+
+    def getGraphColor(self):
+        return self.ctrlGraphColor

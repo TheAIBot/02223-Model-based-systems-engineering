@@ -142,7 +142,7 @@ def bfs(sim, startLaneID, startTLID, incommingTLLaneIDs, detectorRoadIDToDetecto
 class ctrl(TrafficLightController):
 
     def __init__(self):
-        super().__init__("magic stuff", trainFirst=True)
+        super().__init__("Weight-LQF", 'r', trainFirst=True)
 
     def init(self, sim):
         super().init(sim)
@@ -265,11 +265,6 @@ class ctrl(TrafficLightController):
                 #only send updates from this group if this group has
                 #green light
                 if not tlInter.inGroupsGreenPhase(group):
-                    continue
-
-                #every 5 steps in green phase will send updates
-                #to other traffic lights
-                if tlInter.getTimeInCurrentPhase() % 5 != 0:
                     continue
 
                 for detectorID in group.getLaneDetectorIDs():

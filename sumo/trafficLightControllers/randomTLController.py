@@ -4,7 +4,7 @@ from trafficLightController import TrafficLightController
 class ctrl(TrafficLightController):
 
     def __init__(self):
-        super().__init__("Random")
+        super().__init__("Random", 'm')
 
     def updateLights(self, sim, ticks):
         if ticks % 50 == 0:
