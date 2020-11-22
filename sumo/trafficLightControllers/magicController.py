@@ -267,11 +267,6 @@ class ctrl(TrafficLightController):
                 if not tlInter.inGroupsGreenPhase(group):
                     continue
 
-                #every 5 steps in green phase will send updates
-                #to other traffic lights
-                if tlInter.getTimeInCurrentPhase() % 5 != 0:
-                    continue
-
                 for detectorID in group.getLaneDetectorIDs():
                     for connection in self.tlweightConnections[tlInter.tlID][detectorID]:
                         weight = group.getDetectorLastStepLeftVehiclesCount(detectorID)
