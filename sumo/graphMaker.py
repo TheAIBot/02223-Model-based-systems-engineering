@@ -242,6 +242,7 @@ def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
     # for every detector length, run the simulation and make some graphs
     xData = tuple(detectorLengths)
     yData = {}
+    colors = []
 
     results = {}
     for length in detectorLengths:
@@ -253,13 +254,15 @@ def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
         result = results[length]
         for ctrlResult in result:
             ctrlName = ctrlResult.getControllerName()
+            if result.getGraphColor() not in colors:
+                colors.append(result.getGraphColor())
             print(f"ctrl: {ctrlName}, length: {length}")
             if ctrlName not in yData.keys():
                 yData[ctrlName] = []
             meanTravelTime = ctrlResult.getAverageTravelTime()
             yData[ctrlName].append(meanTravelTime)
 
-    createBarChart(mapPath, xData, yData,
+    createLineChart(mapPath, xData, yData, colors,
     "Mean travel time, lane detector length", 
     "Lane detector length (m)", "Mean travel time (steps)",
     "vehicle-lane-detector-length-mean-travel-time.pdf")
