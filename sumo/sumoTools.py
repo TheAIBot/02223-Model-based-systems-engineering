@@ -8,7 +8,7 @@ from multiprocessing import Pool, cpu_count
 
 def genRandomTrips(mapFilepath, routeIndex, vehicleCount, throughputMultiplier, seed = 56):
     rng.seed(seed)
-    tripsStartTime = round(rng.uniform(0, 1000))
+    tripsStartTime = round(rng.uniform(0, 10000))
     throughputInc = 1.0 / throughputMultiplier
     tripsReleaseTime = rng.uniform(100 * throughputInc, 400 * throughputInc)
     tripsEndTime = round(tripsStartTime + tripsReleaseTime)

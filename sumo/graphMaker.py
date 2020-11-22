@@ -341,7 +341,7 @@ if __name__ == '__main__':
     densities = [1, 2, 3, 4, 5]
     detectorLengths = [5, 20, 50, 100, 200]
 
-    makeAllComparisons(mapFilepath, ctrls, 25, densities, detectorLengths)
+    makeAllComparisons(mapFilepath, ctrls, 1500, densities, detectorLengths)
 
 
     # densities = []

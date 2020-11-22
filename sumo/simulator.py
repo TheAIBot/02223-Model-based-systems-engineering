@@ -25,8 +25,8 @@ else:
 from sumolib import checkBinary  # noqa
 import traci  # noqa
 
-def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.25, additionalTrafficlighPhases = False):
-    routeFile = sumoTools.generateRoutes(mapFilepath, 50, 10, trafficThroughputMultiplier)
+def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.5, additionalTrafficlighPhases = False):
+    routeFile = sumoTools.generateRoutes(mapFilepath, 50, 100, trafficThroughputMultiplier)
     return createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = additionalTrafficlighPhases)
 
 def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = False):
