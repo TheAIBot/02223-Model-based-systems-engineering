@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+from trafficLightControllers import mappingBasedController
 import matplotlib.pyplot as plt
 import numpy as np
 import subprocess
@@ -337,7 +338,8 @@ if __name__ == '__main__':
     sumoTools.createRandomMap(mapFilepath)
     sumoTools.createLaneDetectors(mapFilepath)
 
-    ctrls = [staticCtrl.ctrl(), randCtrl.ctrl(), lqfCtrl.ctrl(), weightlqfCtrl.ctrl(), fairCtrl.ctrl()]
+    ctrls = [staticCtrl.ctrl(), randCtrl.ctrl(), lqfCtrl.ctrl(), weightlqfCtrl.ctrl(), 
+    fairCtrl.ctrl(), mappingBasedController.ctrl(42119867965981150217294683521524411208)]
     densities = [1, 2, 3, 4, 5]
     detectorLengths = [5, 20, 50, 100, 200]
 
