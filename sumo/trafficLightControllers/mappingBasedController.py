@@ -6,7 +6,7 @@ class ctrl(TrafficLightController):
     intervalsTime = [0, 40, 80, 120, 160]
 
     def __init__(self, config):
-        super().__init__(f"Mapping based controller {config}")
+        super().__init__(f"Mapping based controller {config}", 'm')
         self.lastChanges = {}
         self.moves = {}
         lenInter = len(ctrl.intervals)

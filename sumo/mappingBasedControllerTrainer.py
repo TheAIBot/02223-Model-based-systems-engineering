@@ -15,7 +15,7 @@ def getResult(config, mapConfigFile, maxSteps):
 
 def test_map(mapPath):
     bits = 125
-    startMax = 3500
+    startMax = 12000
     mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapPath)
 
     random.seed(time.time())
