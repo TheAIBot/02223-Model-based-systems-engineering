@@ -60,7 +60,7 @@ class SumoSim():
 
         trafficLightController.init(self.sumoCon)
 
-    def run(self, takeMeasurements = True, maxTicks = 100000):
+    def run(self, takeMeasurements = True, maxTicks = 100000, ticksStartBreaking = 100000, maxAverage = 1000000):
         measurements = SimMeasurements(1, self.tlCtrl)
 
         ticks = 0
@@ -71,6 +71,8 @@ class SumoSim():
                 measurements.update(self.sumoCon)
 
             self.sumoCon.simulationStep()
+            if ticks>ticksStartBreaking and measurements.getAverageTravelTime()>maxAverage:
+                break
             ticks += 1
             if ticks > maxTicks:
                 break

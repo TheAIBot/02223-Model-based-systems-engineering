@@ -39,6 +39,10 @@ class ctrl(TrafficLightController):
         # The constructor of TrafficLightController expects
         # the name of the controller as its only argument.
         super().__init__("FP", 'b')
+        self.delay_groups = {}
+        self.last_switch = {}
+        self.last_target = {}
+        self.backoff = {}
 
     def init(self, sim):
         super().init(sim)
@@ -59,6 +63,9 @@ class ctrl(TrafficLightController):
         del steps
 
         for inters in self.tlIntersections:
+            self.updateIntersection(inters,seconds,sim)
+
+    def updateIntersection(self, inters, seconds, sim):
             iID = inters.tlID
             groups = inters.getTrafficLightGroups()
             count = len(groups)
@@ -96,7 +103,7 @@ class ctrl(TrafficLightController):
                 else:
                     pass
                     #inters.setGroupAsGreen(groups[last_target], sim)
-                continue
+                return
 
             if iID not in self.last_switch:
                 self.last_switch[iID] = seconds

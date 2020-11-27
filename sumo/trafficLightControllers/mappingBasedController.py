@@ -1,19 +1,27 @@
+from trafficLightControllers import fairPrediction
 from trafficLightController import TrafficLightController
 
 
 class ctrl(TrafficLightController):
-    intervals = [0, 5, 10, 15, 20]
-    intervalsTime = [0, 40, 80, 120, 160]
+    intervals = [0, 1, 2, 3, 4, 5, 7, 9, 12, 15]
+    intervalsTime = [0, 6]
+
+    def bits():
+        lenIntervals = len(ctrl.intervals)
+        lenIntervalsTime = len(ctrl.intervalsTime)
+        bits = lenIntervals*lenIntervals*lenIntervalsTime
+        return bits
 
     def __init__(self, config):
-        super().__init__(f"Mapping based controller {config}", 'm')
+        self.inner = fairPrediction.ctrl()
+        super().__init__(f"Mapping", 'y')
         self.lastChanges = {}
         self.moves = {}
         lenInter = len(ctrl.intervals)
         for i in range(lenInter):
             for j in range(lenInter):
                 for k in range(len(ctrl.intervalsTime)):
-                    bitIdx = k * lenInter * lenInter + j * lenInter + i
+                    bitIdx = (k * lenInter * lenInter) + (j * lenInter) + i
                     flag = (config >> bitIdx) & 1
                     self.moves[(i, j, k)] = flag
 
@@ -25,6 +33,7 @@ class ctrl(TrafficLightController):
         for tlIntersection in self.tlIntersections:
             groups = tlIntersection.getTrafficLightGroups()
             if len(groups) != 2:
+                self.inner.updateIntersection(tlIntersection, ticks, sim)
                 continue
 
             group1 = groups[0]
@@ -51,7 +60,7 @@ class ctrl(TrafficLightController):
         timeSinceLastChange = ticks - self.lastChanges[tlIntersection]
         timeSinceLastChangeMapped = 0
         for i, val in enumerate(ctrl.intervalsTime):
-            if timeSinceLastChange > val:
+            if timeSinceLastChange >= val:
                 timeSinceLastChangeMapped = i
 
         return timeSinceLastChangeMapped
@@ -60,7 +69,7 @@ class ctrl(TrafficLightController):
         waiting = group.getSumLaneDetectorValues()
         waitingMapped = 0
         for i, val in enumerate(ctrl.intervals):
-            if waiting > val:
+            if waiting >= val:
                 waitingMapped = i
 
         return waitingMapped
