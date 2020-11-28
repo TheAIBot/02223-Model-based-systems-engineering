@@ -255,8 +255,8 @@ def makeComparisonsDetectorLengths(mapPath, ctrls, detectorLengths):
         result = results[length]
         for ctrlResult in result:
             ctrlName = ctrlResult.getControllerName()
-            if result.getGraphColor() not in colors:
-                colors.append(result.getGraphColor())
+            if ctrlResult.getGraphColor() not in colors:
+                colors.append(ctrlResult.getGraphColor())
             print(f"ctrl: {ctrlName}, length: {length}")
             if ctrlName not in yData.keys():
                 yData[ctrlName] = []
