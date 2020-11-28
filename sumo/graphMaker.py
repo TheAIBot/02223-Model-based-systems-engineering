@@ -339,7 +339,7 @@ if __name__ == '__main__':
     sumoTools.createLaneDetectors(mapFilepath)
 
     ctrls = [staticCtrl.ctrl(), randCtrl.ctrl(), lqfCtrl.ctrl(), weightlqfCtrl.ctrl(), 
-    fairCtrl.ctrl(), mappingBasedController.ctrl(42119867965981150217294683521524411208)]
+    fairCtrl.ctrl(), mappingBasedController.ctrl(14466144651850748237373257420948699309094288155222589254849)]
     densities = [1, 2, 3, 4, 5]
     detectorLengths = [5, 20, 50, 100, 200]
 
