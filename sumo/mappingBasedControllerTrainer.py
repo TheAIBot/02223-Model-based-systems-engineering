@@ -10,15 +10,17 @@ from trafficLightControllers import mappingBasedController
 
 bits = mappingBasedController.ctrl.bits()
 startMax = 14000
-mutChange = 0.4
-cutoff = 280
+mutChange = 0.003
+cutoff = 225
 initialTries = 800
-threads = 10
+threads = 8
 
 # todo add rules to ignore bullshit configs
-# for example, if we change the light when there are 10 on current, 20 on other and 20 s since last change, 
+# for example, if we change the light when there are 10 on current, 20 on other and 20 s since last change,
 # we should also change it for all times > 20 and all other > 20
-# with that, create a dictionary of current results, and dont recompute bullshit mutations 
+# with that, create a dictionary of current results, and dont recompute bullshit mutations
+
+
 def getResult(config, mapConfigFile):
     newController = mappingBasedController.ctrl(config)  # lqf 5676
     newResult = sim.SumoSim(mapConfigFile, newController).run(
@@ -43,7 +45,7 @@ def runHillClimbing(mapConfigFile, config, result):
 
 def runHillClimbingIter(config, mapConfigFile):
     processData = []
-    bitIndices=list(range(bits))
+    bitIndices = list(range(bits))
     random.shuffle(bitIndices)
     for i in bitIndices:
         newConfig = config ^ (1 << i)
@@ -72,7 +74,7 @@ def runGenetic(mapConfigFile, lenBest, lenGen):
         with Pool(threads) as mpPool:
             mpPool.starmap(getResult, processData)
 
-        append_if_not_exists    ("results.txt", "\n")
+        append_if_not_exists("results.txt", "\n")
         global mutChange
         mutChange /= 2
 
@@ -158,9 +160,12 @@ if __name__ == '__main__':
     sumoTools.createLaneDetectors(mapFilepath)
     mapConfigFile = sim.createSimSumoConfigWithRandomTraffic(mapFilepath)
 
-    random.seed(time.time())
-    #GetInitial(mapConfigFile)
+    conf = 14466144651850748237373257420948699309094288155222589254849
+    getResult(conf, mapConfigFile)
 
-    runGenetic(mapConfigFile, 12, 150)
-    #best = readBest(1)[0]
-    #runHillClimbing(mapConfigFile, best, 238)
+    # random.seed(time.time())
+    # #GetInitial(mapConfigFile)
+
+    # runGenetic(mapConfigFile,20, 150)
+    # #best = readBest(1)[0]
+    # #runHillClimbing(mapConfigFile, best, 238)
