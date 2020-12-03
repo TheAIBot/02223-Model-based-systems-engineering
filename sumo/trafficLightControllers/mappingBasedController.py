@@ -12,7 +12,7 @@ class ctrl(TrafficLightController):
         bits = lenIntervals*lenIntervals*lenIntervalsTime
         return bits
 
-    def __init__(self, config):
+    def __init__(self, config = 14466144651850748237373257420948699309094288155222589254849):
         super().__init__(f"Mapping", 'orange')
         self.inner = fairPrediction.ctrl()
         self.lastChanges = {}

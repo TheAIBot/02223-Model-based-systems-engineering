@@ -9,6 +9,8 @@ import optparse
 import random
 import pathlib as Path
 import string
+import datetime
+now = datetime.datetime.now
 
 import sumoTools
 from simMeasurements import SimMeasurements
@@ -23,7 +25,27 @@ else:
     sys.exit("please declare environment variable 'SUMO_HOME'")
 
 from sumolib import checkBinary  # noqa
-import libsumo
+
+SUMO = None
+SUMO_IMPL = None
+
+def _import_libsumo():
+    global SUMO, SUMO_IMPL
+    import libsumo as libsumo_hidden
+    SUMO = libsumo_hidden
+    SUMO_IMPL = "libsumo"
+
+def _import_traci():
+    global SUMO, SUMO_IMPL
+    import traci as traci_hidden
+    SUMO = traci_hidden
+    SUMO_IMPL = "traci"
+
+try:
+    _import_libsumo()
+except:
+    print("Libsumo unavailable, falling back to TraCI.")
+    _import_traci()
 
 def createSimSumoConfigWithRandomTraffic(mapFilepath, trafficThroughputMultiplier = 0.5, additionalTrafficlighPhases = False):
     routeFile = sumoTools.generateRoutes(mapFilepath, 50, 100, trafficThroughputMultiplier)
@@ -51,34 +73,45 @@ def createSimSumoConfig(mapFilepath, routeFile, additionalTrafficlighPhases = Fa
 
 class SumoSim():
 
-    def __init__(self, mapConfigFilepath, trafficLightController, scale = 1):
+    def __init__(self, mapConfigFilepath, trafficLightController, scale = 1, gui = False):
+        if gui and SUMO_IMPL == "libsumo":
+            print("Libsumo doesn't support launching the GUI, falling back to TraCI.")
+            _import_traci()
+
         self.tlCtrl = trafficLightController
         self.label = str(self.tlCtrl) + ''.join(random.choice(string.ascii_lowercase) for i in range(20))
 
-        libsumo.start([checkBinary("sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000", "--no-warnings", "true", "--scale", str(scale)])
+        SUMO.start([checkBinary("sumo-gui" if gui else "sumo"), "-c", mapConfigFilepath, "--device.emissions.probability", "1", "--waiting-time-memory", "100000", "--no-warnings", "true", "--scale", str(scale)])
 
-        trafficLightController.init(libsumo)
+        trafficLightController.init(SUMO)
 
     def run(self, takeMeasurements = True, maxTicks = 100000, ticksStartBreaking = 100000, maxAverage = 1000000):
         measurements = SimMeasurements(1, self.tlCtrl)
 
+        start_time = now()
+
         ticks = 0
-        while libsumo.simulation.getMinExpectedNumber() > 0:
-            self.tlCtrl.update(libsumo, ticks)
+        while SUMO.simulation.getMinExpectedNumber() > 0:
+            self.tlCtrl.update(SUMO, ticks)
 
             if takeMeasurements:
-                measurements.update(libsumo)
+                measurements.update(SUMO)
 
-            libsumo.simulationStep()
+            SUMO.simulationStep()
             if ticks>ticksStartBreaking and measurements.getAverageTravelTime()>maxAverage:
                 break
             ticks += 1
             if ticks > maxTicks:
                 break
 
-        measurements.collectAfterSimEnd(libsumo)
+        measurements.collectAfterSimEnd(SUMO)
 
-        libsumo.close()
+        SUMO.close()
         sys.stdout.flush()
+
+        print("=== Controller '{}' took {} to finish. ===".format(
+            self.tlCtrl.getName(),
+            now() - start_time,
+        ))
 
         return measurements
